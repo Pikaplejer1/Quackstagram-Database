@@ -4,8 +4,14 @@ import java.sql.*;
 
 public class DatabaseInstance {
     private static DatabaseInstance instance;
+    String url;
+    String username;
+    String password;
+
     private DatabaseInstance(String url, String username, String password){
-        connect(url,username,password);
+        this.url = url;
+        this.username = username;
+        this.password = password;
     }
 
     public static DatabaseInstance getInstance(String url, String username, String password){
@@ -14,7 +20,7 @@ public class DatabaseInstance {
         }  return instance;
     }
 
-    public static Connection connect(String url, String username, String password) {
+    public Connection connect() {
         Connection conn;
         try {
             conn = DriverManager.getConnection(url, username, password);
@@ -23,4 +29,5 @@ public class DatabaseInstance {
         }
         return conn;
     }
+
 }

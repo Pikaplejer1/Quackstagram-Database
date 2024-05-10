@@ -1,9 +1,6 @@
 package MainFiles;
 
 import Login.HashingUtil;
-import java.util.List;
-import java.util.ArrayList;
-
 /**
  * Represents a user on Quackstagram.
  * This class holds user-related information including username, bio, password, and pictures.

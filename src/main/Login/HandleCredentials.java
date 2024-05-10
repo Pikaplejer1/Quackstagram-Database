@@ -1,5 +1,6 @@
 package Login;
 
+import Database.GetCredentials;
 import MainFiles.*;
 import UIFiles.*;
 import javax.swing.*;
@@ -52,21 +53,8 @@ public class HandleCredentials {
      * @return true if credentials are valid, false otherwise.
      */
     private Boolean verifyCredentials(String username, String password) {
-        try (BufferedReader reader = new BufferedReader(new FileReader(pathFile.credentialsNamePath()))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                String[] credentials = line.split(":");
-                if (credentials[0].equals(username) && credentials[1].equals(HashingUtil.toHash(password))) {
-                    String bio = credentials[2];
-                    newUser = new User(username, bio, password); // Assumes User constructor accepts these parameters
-                    saveUserInformation(newUser);
-                    return true;
-                }
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return false;
+        GetCredentials getCredentials = new GetCredentials();
+        return password.equals(getCredentials.getUserPassword(username));
     }
 
     /**
