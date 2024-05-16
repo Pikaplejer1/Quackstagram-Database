@@ -42,6 +42,7 @@ public class InstagramProfileUI extends BaseUI {
         setLayout(new BorderLayout());
 
         profileDetailsReader.readAndSetFollowing(user);
+        profileDetailsReader.readAndSetFollowed(user);
         profileDetailsReader.readImageDetails(user);
         profileDetailsReader.bioReader(user);
 
