@@ -7,7 +7,7 @@ import java.sql.SQLException;
 
 public class GetCredentials {
 
-    DatabaseInstance database = DatabaseInstance.getInstance("jdbc:mysql://localhost:3306/quackstagram_db","root","marcel");
+    DatabaseInstance database = DatabaseInstance.getInstance("jdbc:mysql://localhost:3306/Quackstagram","root","julia");
     Connection conn = database.connect();
     public String getUserPassword(String username){
         String hashedPassword;

@@ -18,7 +18,7 @@ import java.util.stream.Stream;
  * This class manages the behavior of a button that allows users to follow each other.
  */
 public class FollowManager{
-    DatabaseInstance database = DatabaseInstance.getInstance("jdbc:mysql://localhost:3306/quackstagram_db","root","marcel");
+    DatabaseInstance database = DatabaseInstance.getInstance("jdbc:mysql://localhost:3306/Quackstagram","root","julia");
     Connection conn = database.connect();
 
     public JButton decideType(User userToTakActionOn, JFrame window){
@@ -151,6 +151,8 @@ public class FollowManager{
     }
 
     private String getCurrentUsername(){
+
+        String currentUserUsername = "";
 
         return currentUserUsername;
     }
