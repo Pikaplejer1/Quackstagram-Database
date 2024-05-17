@@ -83,4 +83,5 @@ public class User {
     public User getInstance(){
         return instance;
     }
+
 }
