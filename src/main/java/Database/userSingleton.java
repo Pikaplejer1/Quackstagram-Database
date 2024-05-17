@@ -1,31 +1,16 @@
-package MainFiles;
+package Database;
 
 import Login.HashingUtil;
-import java.util.List;
-import java.util.ArrayList;
 
-/**
- * Represents a user on Quackstagram.
- * This class holds user-related information including username, bio, password, and pictures.
- */
-public class User {
-    private final String username;
-    private String bio;
-    private String password;
-    private int postsCount;
-    private int followersCount;
-    private int followingCount;
-    private User instance = null;
+public class userSingleton {
 
-    /**
-     * Constructs a new User with the specified username, bio, and password.
-     * Initializes picture list and count metrics.
-     *
-     * @param username The username of the user.
-     * @param bio      The biography of the user.
-     * @param password The password of the user.
-     */
-    public User(String username, String bio, String password) {
+    private userSingleton instance=null;
+
+    userSingleton(){
+        instance = new userSingleton();
+    }
+
+    private userSingleton(String username, String bio, String password) {
         this.username = username;
         this.bio = bio;
         this.password = password;
@@ -33,16 +18,20 @@ public class User {
         this.followersCount = 0;
         this.followingCount = 0;
     }
-
-
-    /**
-     * Constructs a new User with the specified username.
-     *
-     * @param username The username of the user.
-     */
-    public User(String username) {
-        this.username = username;
+    public userSingleton getInstance() {
+        if(instance ==null){
+            instance = new userSingleton();
+        }
+        return instance;
     }
+
+    private String username;
+    private String bio;
+    private String password;
+    private int postsCount;
+    private int followersCount;
+    private int followingCount;
+
 
     // Getter and setter methods
     public String getUsername() { return username; }
@@ -74,10 +63,4 @@ public class User {
         return username + ":" + bio + ":" + HashingUtil.toHash(password); // Hashes password
     }
 
-    public User getInstance(String username, String bio, String password) {
-        if(instance == null){
-            instance = new User(username,bio,password);
-        }
-        return instance;
-    }
 }
