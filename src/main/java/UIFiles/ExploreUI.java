@@ -233,7 +233,7 @@ public class ExploreUI extends BaseUI {
         JButton usernameLabel = new JButton(username);
 
         usernameLabel.addActionListener(e -> {
-            User user = new User(finalUsername); // Assuming User class has a constructor that takes a username
+            User user = User.getInstance(); // Assuming User class has a constructor that takes a username
             InstagramProfileUI profileUI = new InstagramProfileUI();
 
             profileUI.setVisible(true);

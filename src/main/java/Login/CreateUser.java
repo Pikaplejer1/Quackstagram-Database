@@ -1,8 +1,10 @@
 package Login;
 
+import Database.UpdateCredentials;
 import MainFiles.FilePathInstance;
 import MainFiles.User;
 import java.io.*;
+import java.sql.SQLException;
 
 /**
  * Handles the creation and updating of user credentials.
@@ -20,12 +22,11 @@ public class CreateUser {
      * @param bio      The user's bio.
      */
     public void saveCredentials(String username, String password, String bio) {
-        String credentials = username + ":" + password + ":" + bio;
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(pathFile.credentialsNamePath(), true))) {
-            writer.write(credentials);
-            writer.newLine();
-        } catch (IOException e) {
-            e.printStackTrace();
+        UpdateCredentials updateCredentials = new UpdateCredentials();
+        try {
+            updateCredentials.createUser(username,password,bio);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
     }
 

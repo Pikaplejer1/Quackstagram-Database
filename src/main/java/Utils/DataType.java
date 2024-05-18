@@ -2,7 +2,9 @@ package Utils;
 
 public enum DataType {
     PASSWORD("password"),
-    BIO("bio");
+    BIO("bio"),
+    USERNAME("username");
+
 
     private final String columnName;
 

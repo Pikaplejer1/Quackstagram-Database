@@ -1,7 +1,9 @@
 package Login;
 import java.io.*;
 
+import Database.GetCredentials;
 import MainFiles.FilePathInstance;
+import Utils.DataType;
 
 /**
  * Manages profile-related functionalities such as registration and checking if a username exists.
@@ -10,7 +12,7 @@ import MainFiles.FilePathInstance;
 public class ProfileManager extends ProfilePictureManager {
 
     private final FilePathInstance pathFile = FilePathInstance.getInstance();
-    private CreateUser createUser = new CreateUser();
+    private final CreateUser createUser = new CreateUser();
     private final SignUpResultListener listener;
 
     /**
@@ -49,7 +51,8 @@ public class ProfileManager extends ProfilePictureManager {
      * @return true if the username is valid, false otherwise.
      */
     public boolean isValidInput(String username) {
-        return !doesUsernameExist(username);
+        GetCredentials getUsername = new GetCredentials();
+        return username.equals(getUsername.getUserData(username, DataType.USERNAME));
     }
 
     /**

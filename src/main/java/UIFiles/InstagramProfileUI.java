@@ -30,7 +30,6 @@ public class InstagramProfileUI extends BaseUI {
     /**
      * Constructor for InstagramProfileUI.
      *
-     * @param user The User object representing the profile to be displayed.
      */
     public InstagramProfileUI() {
 
