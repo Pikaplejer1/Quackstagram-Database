@@ -1,10 +1,16 @@
 package MainFiles;
 
+import Database.DatabaseInstance;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 /**
  * Reads and sets various details related to a user's profile, including image count, followers, following, and bio.
@@ -12,6 +18,8 @@ import java.nio.file.Paths;
 public class ProfileDetailsReader {
 
     private final FilePathInstance pathFile = FilePathInstance.getInstance();
+    DatabaseInstance database = DatabaseInstance.getInstance("jdbc:mysql://localhost:3306/Quackstagram","root","julia");
+    Connection conn = database.getConn();
 
     /**
      * Reads image details and sets the image count for the specified user.
@@ -42,36 +50,46 @@ public class ProfileDetailsReader {
      */
     public void readAndSetFollowing(User currentUser) {
         int followingCount = 0;
-        int followersCount = 0;
 
-        // Read following.txt to calculate followers and following
-        Path followingFilePath = pathFile.followingPath();
-        try (BufferedReader followingReader = Files.newBufferedReader(followingFilePath)) {
-            String line;
-            while ((line = followingReader.readLine()) != null) {
-                String[] parts = line.split(":");
-                if (parts.length == 2) {
-                    String username = parts[0].trim();
-                    String[] followingUsers = parts[1].split(";");
-                    if (username.equals(currentUser.getUsername())) {
-                        followingCount = followingUsers.length;
-                    } else {
-                        for (String followingUser : followingUsers) {
-                            if (followingUser.trim().equals(currentUser.getUsername())) {
-                                followersCount++;
-                            }
-                        }
-                    }
+        try {
+            PreparedStatement preparedStatement = conn.prepareStatement("SELECT COUNT(username_followed) AS result FROM followers WHERE username_followed = ? ");
+
+            preparedStatement.setString(1, currentUser.getUsername());
+
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                while (resultSet.next()) {
+                    followingCount = resultSet.getInt("result");
                 }
             }
-        } catch (IOException e) {
-            e.printStackTrace();
+
+            currentUser.setFollowingCount(followingCount);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
-        currentUser.setFollowersCount(followersCount);
-        currentUser.setFollowingCount(followingCount);
     }
 
-    /**
+    public void readAndSetFollowed(User currentUser) {
+        int followersCount = 0;
+
+        try {
+            PreparedStatement preparedStatement = conn.prepareStatement("SELECT COUNT(username_following) AS result FROM followers WHERE username_following = ? ");
+
+            preparedStatement.setString(1, currentUser.getUsername());
+
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                while (resultSet.next()) {
+                    followersCount = resultSet.getInt("result");
+                }
+            }
+
+            currentUser.setFollowersCount(followersCount);
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+        /**
      * Reads and sets the bio for the specified user.
      *
      * @param currentUser The user whose bio needs to be read and set.

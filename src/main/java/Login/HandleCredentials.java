@@ -54,11 +54,7 @@ public class HandleCredentials {
      */
     private Boolean verifyCredentials(String username, String password) {
         GetCredentials getCredentials = new GetCredentials();
-        if(password.equals(getCredentials.getUserPassword(username))){
-            saveUserInformation(newUser);
-            return true;
-        }
-        return false;
+        return password.equals(getCredentials.getUserPassword(username));
     }
 
     /**

@@ -1,56 +1,21 @@
 package MainFiles;
 
 import Buttons.*;
+import Database.DatabaseInstance;
+
 import javax.swing.*;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Stream;
+import java.sql.*;
+import java.time.Instant;
 
 /**
  * Implements the FollowButtonBehaviour to provide specific actions for a Follow button.
  * This class manages the behavior of a button that allows users to follow each other.
  */
 public class FollowManager{
-    private final FilePathInstance pathFile = FilePathInstance.getInstance();
+    DatabaseInstance database = DatabaseInstance.getInstance("jdbc:mysql://localhost:3306/Quackstagram","root","julia");
+    Connection conn = database.getConn();
 
-    /**
-     * Handles the action of following a user.
-     * Updates the following file to reflect the current user following another user.
-     *
-     * @param usernameToFollow The username of the user to be followed.
-     */
-    public void handleFollowAction(String usernameToFollow){
-        String currentUserUsername = getCurrentUsername();
-        if(!currentUserUsername.isEmpty()){
-            processFollowingFile(currentUserUsername, usernameToFollow);
-        }
-    }
-    /**
-     * Handles the action of unfollowing a user.
-     * Updates the following file to reflect the current user unfollowing another user.
-     *
-     * @param usernameToUnFollow The username of the user to be unfollowed.
-     */
-
-    public void handleUnFollowAction(String usernameToUnFollow){
-
-        String currentUserUsername = getCurrentUsername();
-
-        if(!currentUserUsername.isEmpty()){
-            processUnFollowingFile(currentUserUsername, usernameToUnFollow);
-        }
-    }
-
-    /**
-     * Decides and returns the appropriate button type based on the relationship with the current user.
-     *
-     * @param currentUser The user whose profile is being viewed.
-     * @return A JButton that reflects the relationship status with the current user.
-     */
-    public JButton decideType(User currentUser, JFrame window){
+    public JButton decideType(User userToTakActionOn, JFrame window){
 
         JButton finalButton = new JButton();
 
@@ -62,19 +27,20 @@ public class FollowManager{
         FollowButton editProfileButton = new FollowButton(editProfile);
         FollowButton followingButton = new FollowButton(following);
 
-        boolean thisUser = isCurrentUser(currentUser);
+        boolean thisUser = isCurrentUser(userToTakActionOn);
+        String currentUser = getCurrentUsername();
 
         if (thisUser) {
 
-            finalButton = editProfileButton.createButton(currentUser, window);
+            finalButton = editProfileButton.createButton(userToTakActionOn, window);
 
-        } else if ((!thisUser )&& (isAlreadyFollowed(currentUser))) {
+        } else if ((!thisUser )&& (isAlreadyFollowed(currentUser, userToTakActionOn.getUsername()))) {
 
-            finalButton = followingButton.createButton(currentUser, window);
+            finalButton = followingButton.createButton(userToTakActionOn, window);
 
-        } else if ((!thisUser) && (!isAlreadyFollowed(currentUser))){
+        } else if ((!thisUser) && (!isAlreadyFollowed(currentUser, userToTakActionOn.getUsername()))){
 
-            finalButton = followButton.createButton(currentUser,window);
+            finalButton = followButton.createButton(userToTakActionOn,window);
 
         } else {
             System.out.println("It doesnt work");
@@ -83,133 +49,111 @@ public class FollowManager{
          return finalButton;
     }
 
-    private void processUnFollowingFile(String currentUsername, String usernameToUnFollow) {
-        try {
-            List<String> fileContent = readFollowingFile();
-            String updatedContent = updateUnFollowingContent(fileContent, currentUsername, usernameToUnFollow);
-            writeFollowingFile(updatedContent);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+    public void handleFollowAction(String usernameToFollow){
+        String currentUserUsername = getCurrentUsername();
+        if(!currentUserUsername.isEmpty()){
+            processFollowing(currentUserUsername, usernameToFollow);
         }
     }
 
-    private String updateUnFollowingContent(List<String> fileContent, String currentUsername, String usernameToUnFollow) {
-        StringBuilder stringBuilder = new StringBuilder();
-        for (String line : fileContent) {
-            if (line.startsWith(currentUsername + ":")) {
-                String[] parts = line.split(":");
-                String followedUsersString = parts[1];
-                String[] followedUsers = followedUsersString.split(";");
-                StringBuilder updatedFollowedUsers = new StringBuilder();
-                for (String followedUser : followedUsers) {
-                    if (!followedUser.trim().equals(usernameToUnFollow)) {
-                        updatedFollowedUsers.append(followedUser.trim()).append(";");
-                    }
-                }
-                if (updatedFollowedUsers.length() > 0) {
-                    updatedFollowedUsers.setLength(updatedFollowedUsers.length() - 1); // Remove trailing semicolon
-                }
-                stringBuilder.append(parts[0]).append(": ").append(updatedFollowedUsers.toString()).append("\n");
+    public void handleUnFollowAction(String usernameToUnFollow){
+
+        String currentUserUsername = getCurrentUsername();
+
+        if(!currentUserUsername.isEmpty()){
+            processUnFollowing(currentUserUsername, usernameToUnFollow);
+        }
+    }
+
+    private void processUnFollowing(String currentUsername, String usernameToUnFollow) {
+        updateUnFollowingContent(currentUsername, usernameToUnFollow);
+        System.out.println("Succesfully "+ currentUsername +" unfollowed " + usernameToUnFollow);
+    }
+
+    private void processFollowing(String currentUsername, String usernameToFollow) {
+        updateFollowingContent(currentUsername, usernameToFollow);
+        System.out.println("Succesfully "+ currentUsername +" followed " + usernameToFollow);
+    }
+
+    private void updateUnFollowingContent(String currentUsername, String usernameToUnFollow) {
+        try {
+
+            PreparedStatement preparedStatement = conn.prepareStatement(
+                    "DELETE FROM followers WHERE username_followed = ? AND username_following = ?");
+
+            preparedStatement.setString(1, usernameToUnFollow);
+            preparedStatement.setString(2, currentUsername);
+
+            int rowsAffected = preparedStatement.executeUpdate();
+
+            if (rowsAffected > 0) {
+                System.out.println("Unfollowed successfully.");
             } else {
-                stringBuilder.append(line).append("\n");
+                System.out.println("No matching follow record found.");
             }
-        }
-        return stringBuilder.toString();
-    }
 
-    private void processFollowingFile(String currentUsername, String usernameToFollow) {
-        try {
-            List<String> fileContent = readFollowingFile();
-            String updatedContent = updateFollowingContent(fileContent, currentUsername, usernameToFollow);
-            writeFollowingFile(updatedContent);
-        } catch (IOException e) {
+        } catch (SQLException e) {
             throw new RuntimeException(e);
         }
     }
 
-    private List<String> readFollowingFile() throws IOException {
-        List<String> lines = new ArrayList<>();
-        if (Files.exists(pathFile.followingPath())) {
-            lines = Files.readAllLines(pathFile.followingPath());
+    private void updateFollowingContent(String currentUsername, String usernameToFollow) {
+
+        Instant timestamp = Instant.now();
+
+        try {
+            PreparedStatement preparedStatement = conn.prepareStatement(
+                    "INSERT INTO followers (username_followed, username_following, timestamp)" +
+                    "VALUES (?, ?, ?)");
+            preparedStatement.setString(1, usernameToFollow);
+            preparedStatement.setString(2, currentUsername);
+            preparedStatement.setTimestamp(3, Timestamp.from(timestamp));
+
+            int rowsAffected = preparedStatement.executeUpdate();
+
+            if (rowsAffected > 0) {
+                System.out.println("Followed successfully.");
+            } else {
+                System.out.println("Something went wrong");
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
-        return lines;
     }
 
-    private String updateFollowingContent(List<String> fileContent, String currentUsername, String usernameToFollow) {
-        StringBuilder stringBuilder = new StringBuilder();
-        boolean isUserFound = false;
-        for (String line : fileContent) {
-            if (line.startsWith(currentUsername + ":")) {
-                isUserFound = true;
-                if (!line.contains(usernameToFollow)) {
-                    line += ";" + usernameToFollow;
+    public boolean isAlreadyFollowed(String currentUser, String userToFollow){
+
+        try {
+            PreparedStatement preparedStatement = conn.prepareStatement(
+                    "SELECT * FROM followers WHERE username_followed = ? AND username_following = ?");
+
+            preparedStatement.setString(1, userToFollow);
+            preparedStatement.setString(2, currentUser);
+
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                while (resultSet.next()) {
+                    return true;
                 }
             }
-            stringBuilder.append(line).append("\n");
-        }
-        if (!isUserFound) {
-            stringBuilder.append(currentUsername).append(": ").append(usernameToFollow).append("\n");
-        }
-        return stringBuilder.toString();
-    }
 
-    private void writeFollowingFile(String content) throws IOException {
-        Files.write(pathFile.followingPath(), content.getBytes());
-    }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
 
+        return false;
+    }
 
     private String getCurrentUsername(){
-        String currentUserUsername = null;
-        try (BufferedReader reader = Files.newBufferedReader(pathFile.usersPath())) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                String[] parts = line.split(":");
-                currentUserUsername = parts[0];
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-            throw new RuntimeException(e);
-        }
+
+        String currentUserUsername = "";
+
         return currentUserUsername;
-    }
-
-
-    public boolean isAlreadyFollowed(User currentUser){
-
-        boolean isAlreadyFollowed = false;
-        // Check if the current user is already being followed by the logged-in user
-        try (BufferedReader reader = Files.newBufferedReader(pathFile.followingPath())) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                String[] parts = line.split(":");
-                if (parts[0].trim().equals(loggedInUsername())) {
-                    String[] followedUsers = parts[1].split(";");
-                    for (String followedUser : followedUsers) {
-                        if (followedUser.trim().equals(currentUser.getUsername())) {
-                            isAlreadyFollowed = true;
-                            break;
-                        }
-                    }
-                }
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return isAlreadyFollowed;
     }
 
     public String loggedInUsername() {
         String loggedInUsername = "";
 
-        // Read the logged-in user's username from the "users.txt" file
-        try (BufferedReader reader = Files.newBufferedReader(pathFile.usersPath())) {
-            String line = reader.readLine();
-            if (line != null) {
-                loggedInUsername = line.split(":")[0].trim();
-            }
-        } catch (IOException e) {
-            e.printStackTrace();  // Handle or log the exception appropriately
-        }
 
         return loggedInUsername;
     }
@@ -218,15 +162,7 @@ public class FollowManager{
 
         boolean isCurrentUser = false;
 
-        // Check if the username matches the logged-in username
-        isCurrentUser = loggedInUsername().equals(currentUser.getUsername());
 
-        // Check if the username is present in the "users.txt" file
-        try (Stream<String> lines = Files.lines(pathFile.usersPath())) {
-            isCurrentUser = lines.anyMatch(line -> line.startsWith(currentUser.getUsername() + ":"));
-        } catch (IOException e) {
-            e.printStackTrace();  // Handle or log the exception appropriately
-        }
 
         return isCurrentUser;
     }

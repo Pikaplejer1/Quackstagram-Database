@@ -24,7 +24,7 @@ public class SignUpUI extends LoginBaseUI implements  SignUpResultListener{
     private JLabel lblBio;
     private JButton btnRegister, btnUploadPhoto, btnSignIn;
 
-    private final ProfileManager profileManager;
+    private ProfileManager profileManager;
 
     /**
      * Constructor for SignUpUI.
@@ -113,7 +113,7 @@ public class SignUpUI extends LoginBaseUI implements  SignUpResultListener{
         String username = txtUsername.getText();
         String password = new String(txtPassword.getPassword());
         String bio = txtBio.getText();
-        if(!username.isEmpty())
+        if(profileManager.isValidInput(username))
             profileManager.onRegisterClicked(username,password, bio);
     }
 
@@ -121,7 +121,7 @@ public class SignUpUI extends LoginBaseUI implements  SignUpResultListener{
         String username = txtUsername.getText();
         if (username.isEmpty()) {
             JOptionPane.showMessageDialog(this, "Please enter a username before uploading a photo");
-        } else if (profileManager.doesUsernameExists(username)) {
+        } else if (profileManager.doesUsernameExist(username)) {
             JOptionPane.showMessageDialog(this, "This username already exists");
         } else{
             profileManager.handleProfilePictureUpload(this, username);
