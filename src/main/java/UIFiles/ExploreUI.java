@@ -234,7 +234,7 @@ public class ExploreUI extends BaseUI {
 
         usernameLabel.addActionListener(e -> {
             User user = new User(finalUsername); // Assuming User class has a constructor that takes a username
-            InstagramProfileUI profileUI = new InstagramProfileUI(user);
+            InstagramProfileUI profileUI = new InstagramProfileUI();
 
             profileUI.setVisible(true);
             dispose(); // Close the current frame

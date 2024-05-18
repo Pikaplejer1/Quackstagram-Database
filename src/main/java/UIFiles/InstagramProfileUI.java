@@ -3,6 +3,7 @@ package UIFiles;
 import MainFiles.FollowManager;
 import MainFiles.User;
 import MainFiles.ProfileDetailsReader;
+
 import javax.swing.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -21,9 +22,9 @@ public class InstagramProfileUI extends BaseUI {
 
     private static final int PROFILE_IMAGE_SIZE = 80; // Adjusted size for the profile image to match UI
     private static final int GRID_IMAGE_SIZE = WIDTH / 3; // Static size for grid images
-    private JPanel contentPanel; // Panel to display the image grid or the clicked image
-    private User currentUser; // User object to store the current user's information
-    private ProfileDetailsReader profileDetailsReader = new ProfileDetailsReader();
+    private final JPanel contentPanel; // Panel to display the image grid or the clicked image
+    private final User user; // User object to store the current user's information
+    private final ProfileDetailsReader profileDetailsReader = new ProfileDetailsReader();
 
 
     /**
@@ -31,10 +32,10 @@ public class InstagramProfileUI extends BaseUI {
      *
      * @param user The User object representing the profile to be displayed.
      */
-    public InstagramProfileUI(User user) {
+    public InstagramProfileUI() {
 
         super("");
-        this.currentUser = user;
+        this.user = User.getInstance();
         setSize(WIDTH,HEIGHT);
         contentPanel = new JPanel();
         setMinimumSize(new Dimension(WIDTH, HEIGHT));
@@ -43,11 +44,11 @@ public class InstagramProfileUI extends BaseUI {
 
         profileDetailsReader.readAndSetFollowing(user);
         profileDetailsReader.readAndSetFollowed(user);
-        profileDetailsReader.readImageDetails(user);
+        ProfileDetailsReader.readImageDetails(user);
         profileDetailsReader.bioReader(user);
 
-        System.out.println("Bio for " + currentUser.getUsername() + ": " + user.getBio());
-        System.out.println(currentUser.getPostsCount());
+        System.out.println("Bio for " + user.getUsername() + ": " + user.getBio());
+        System.out.println(user.getPostsCount());
         initializeUI();
     }
 
@@ -79,11 +80,11 @@ public class InstagramProfileUI extends BaseUI {
         headerPanel.setBackground(Color.GRAY);
 
         // Top Part of the Header (Profile Image, Stats, Follow Button)
-        JPanel topHeaderPanel = createTopHeaderPanel(currentUser);
+        JPanel topHeaderPanel = createTopHeaderPanel(user);
         headerPanel.add(topHeaderPanel);
 
         // Profile Name and Bio Panel
-        JPanel profileNameAndBioPanel = createProfileAndBioPanel(currentUser);
+        JPanel profileNameAndBioPanel = createProfileAndBioPanel(user);
         headerPanel.add(profileNameAndBioPanel);
 
         return headerPanel;
@@ -217,7 +218,7 @@ public class InstagramProfileUI extends BaseUI {
 
         Path imageDir = Paths.get("img", "uploaded");
         try (Stream<Path> paths = Files.list(imageDir)) {
-            paths.filter(path -> path.getFileName().toString().startsWith(currentUser.getUsername() + "_"))
+            paths.filter(path -> path.getFileName().toString().startsWith(user.getUsername() + "_"))
                     .forEach(path -> {
                         ImageIcon imageIcon = new ImageIcon(new ImageIcon(path.toString()).getImage().getScaledInstance(GRID_IMAGE_SIZE, GRID_IMAGE_SIZE, Image.SCALE_SMOOTH));
                         JLabel imageLabel = new JLabel(imageIcon);

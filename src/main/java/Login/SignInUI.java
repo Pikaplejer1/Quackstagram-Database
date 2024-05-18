@@ -116,9 +116,7 @@ public class SignInUI extends LoginBaseUI implements LoginResultListener{
     @Override
     public void onLoginSuccess() {
         dispose();
-        SwingUtilities.invokeLater(() -> {
-           new InstagramProfileUI(loginController.getNewUser());
-        });
+        SwingUtilities.invokeLater(InstagramProfileUI::new);
 
     }
     @Override

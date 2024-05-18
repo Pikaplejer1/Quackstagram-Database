@@ -15,7 +15,7 @@ public class User {
     private int postsCount;
     private int followersCount;
     private int followingCount;
-    private User instance = null;
+    private static User instance = null;
 
     /**
      * Constructs a new User with the specified username, bio, and password.
@@ -74,13 +74,13 @@ public class User {
         return username + ":" + bio + ":" + HashingUtil.toHash(password); // Hashes password
     }
 
-    public User getInstance(String username, String bio, String password) {
+    public static User getInstance(String username, String bio, String password) {
         if(instance == null){
             instance = new User(username,bio,password);
         }
         return instance;
     }
-    public User getInstance(){
+    public static User getInstance(){
         return instance;
     }
 

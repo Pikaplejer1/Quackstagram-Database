@@ -23,7 +23,7 @@ public class ProfileButton extends JFrame implements NavigationButton {
         }
 
         User user = new User(loggedInUsername);
-        InstagramProfileUI profileUI = new InstagramProfileUI(user);
+        InstagramProfileUI profileUI = new InstagramProfileUI();
         profileUI.setVisible(true);
     }
 }

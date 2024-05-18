@@ -3,6 +3,8 @@ package Login;
 import Database.GetCredentials;
 import MainFiles.*;
 import UIFiles.*;
+import Utils.DataType;
+
 import javax.swing.*;
 import java.io.*;
 
@@ -11,8 +13,6 @@ import java.io.*;
  */
 public class HandleCredentials {
     private final LoginResultListener listener;
-    private final FilePathInstance pathFile = FilePathInstance.getInstance();
-    private User newUser;
 
     /**
      * Constructor for HandleCredentials.
@@ -35,7 +35,7 @@ public class HandleCredentials {
         if (verifyCredentials(username, password)) {
             System.out.println("It worked");
             SwingUtilities.invokeLater(() -> {
-                InstagramProfileUI profileUI = new InstagramProfileUI(newUser);
+                InstagramProfileUI profileUI = new InstagramProfileUI();
                 profileUI.setVisible(true);
                 listener.onLoginSuccess();
             });
@@ -54,28 +54,16 @@ public class HandleCredentials {
      */
     private Boolean verifyCredentials(String username, String password) {
         GetCredentials getCredentials = new GetCredentials();
-        return password.equals(getCredentials.getUserPassword(username));
-    }
-
-    /**
-     * Saves user information to a designated file.
-     *
-     * @param user The User object containing the information to be saved.
-     */
-    private void saveUserInformation(User user) {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(pathFile.usersNamePath(), false))) {
-            writer.write(user.toStringHash());  // A toString method in User class to represent user data
-        } catch (IOException e) {
-            e.printStackTrace();
+        if(password.equals(getCredentials.getUserData(username,DataType.PASSWORD))){
+            String bio = getBio(username);
+            User user = User.getInstance(username,bio,password);
+            return true;
         }
+        return false;
     }
 
-    /**
-     * Retrieves the new user object.
-     *
-     * @return The newly created User object.
-     */
-    public User getNewUser() {
-        return newUser;
+    private String getBio(String username) {
+        GetCredentials getBio = new GetCredentials();
+        return getBio.getUserData(username, DataType.BIO);
     }
 }
