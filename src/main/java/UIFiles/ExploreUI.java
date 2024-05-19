@@ -132,6 +132,7 @@ public class ExploreUI extends BaseUI {
         refresh();
     }
 
+    //TODO co to lol?
     private void extractImageDetails(String imagePath ){
 
         // Extract image ID from the imagePath
@@ -243,6 +244,7 @@ public class ExploreUI extends BaseUI {
         return usernameLabel;
     }
 
+    //TODO troche chujowe to liczenie czasu - zrobilam takie dla powiadomien ale musi byc typ danej timestamp a nie string
     private static JLabel createTimeLabel(String timestampString) {
         String timeSincePosting = calculateTimeSincePosting(timestampString);
         JLabel timeLabel = new JLabel(timeSincePosting);

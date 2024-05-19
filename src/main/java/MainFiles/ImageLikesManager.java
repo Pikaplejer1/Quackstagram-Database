@@ -1,6 +1,7 @@
 package MainFiles;
 
 import Database.DatabaseInstance;
+import Notifications.NotificationsCreator;
 
 import javax.swing.*;
 import java.io.*;
@@ -15,35 +16,20 @@ import java.util.*;
 public class ImageLikesManager extends ImageDetailsReader {
 
     DatabaseInstance database = DatabaseInstance.getInstance("jdbc:mysql://localhost:3306/Quackstagram","root","julia");
+    NotificationsCreator creator = new NotificationsCreator();
     Connection conn = database.getConn();
+    User currentUser = User.getInstance();
 
     private final List<Observer> observers;
 
-    /**
-     * Constructor for ImageLikesManager.
-     * Initializes a FileManager for handling likes data and registers observers for updates.
-     *
-     * @throws IOException If there is an error in reading likes from the file.
-     */
     public ImageLikesManager() throws IOException {
         observers = new ArrayList<>();
     }
 
-    /**
-     * Registers an observer to be notified of like state changes.
-     *
-     * @param observer The observer to be registered.
-     */
     public void registerObserver(Observer observer) {
         observers.add(observer);
     }
 
-    /**
-     * Notifies all registered observers of a like state change.
-     *
-     * @param imageId    The ID of the image that was liked or unliked.
-     * @param likesLabel The JLabel displaying the number of likes.
-     */
     public void notifyObservers(String imageId, JLabel likesLabel) {
         for (Observer observer : observers) {
             observer.update(imageId, likesLabel);
@@ -51,8 +37,6 @@ public class ImageLikesManager extends ImageDetailsReader {
     }
 
     protected void handleLikeAction(String postId) {
-
-        //TODO get current User from singleton
 
         Instant timestamp = Instant.now();
 
@@ -62,7 +46,7 @@ public class ImageLikesManager extends ImageDetailsReader {
                             "VALUES (?, ?, ?)");
 
             preparedStatement.setString(1, postId);
-            preparedStatement.setString(2, CURRENT_USER);
+            preparedStatement.setString(2, currentUser.getUsername());
             preparedStatement.setTimestamp(3, Timestamp.from(timestamp));
 
             int rowsAffected = preparedStatement.executeUpdate();
@@ -76,8 +60,31 @@ public class ImageLikesManager extends ImageDetailsReader {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+
+        creator.newNotification(getPostsUser(postId), "like");
     }
 
+    private String getPostsUser(String postId){
+
+        try {
+            PreparedStatement preparedStatement = conn.prepareStatement(
+                    "SELECT username FROM Post WHERE Post_id = ? ");
+
+            preparedStatement.setString(1, postId);
+
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+
+                while (resultSet.next()) {
+                    String username = resultSet.getString("username");
+                    return username ;
+                }
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return "";
+    }
 
 
 
@@ -89,7 +96,7 @@ public class ImageLikesManager extends ImageDetailsReader {
                     "DELETE FROM likes WHERE Post_id = ? AND Username_who_liked = ?");
 
             preparedStatement.setString(1, postId);
-            preparedStatement.setString(2, currentUsername);
+            preparedStatement.setString(2, currentUser.getUsername());
 
             int rowsAffected = preparedStatement.executeUpdate();
 
@@ -111,7 +118,7 @@ public class ImageLikesManager extends ImageDetailsReader {
                     "SELECT * FROM likes WHERE Post_id = ? AND Username_who_liked = ?");
 
             preparedStatement.setString(1, postId);
-            preparedStatement.setString(2, currentUser);
+            preparedStatement.setString(2, currentUser.getUsername());
 
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 while (resultSet.next()) {

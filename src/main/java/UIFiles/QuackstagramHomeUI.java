@@ -252,6 +252,7 @@ public class QuackstagramHomeUI extends BaseUI {
         cardLayout.show(cardPanel, "ImageView");
     }
 
+    //TODO nie wiem
     private void refreshDisplayImage(String[] postData, String imageId) {
         try (BufferedReader reader = Files.newBufferedReader(pathFile.imageDetailsPath())) {
             String line;

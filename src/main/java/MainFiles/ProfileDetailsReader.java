@@ -20,41 +20,35 @@ public class ProfileDetailsReader {
     private final FilePathInstance pathFile = FilePathInstance.getInstance();
     DatabaseInstance database = DatabaseInstance.getInstance("jdbc:mysql://localhost:3306/Quackstagram","root","julia");
     Connection conn = database.getConn();
+    //there is no need for user instance!
 
-    /**
-     * Reads image details and sets the image count for the specified user.
-     *
-     * @param currentUser The user whose image count needs to be set.
-     */
-    public static void readImageDetails(User currentUser) {
+
+
+    //TODO zmienic na czytanie bazy danych ale wsm po co to
+    public static void readImageDetails(User user) {
         int imageCount = 0;
         // Read image_details.txt to count the number of images posted by the user
         Path imageDetailsFilePath = Paths.get("data", "image_details.txt");
         try (BufferedReader imageDetailsReader = Files.newBufferedReader(imageDetailsFilePath)) {
             String line;
             while ((line = imageDetailsReader.readLine()) != null) {
-                if (line.contains("Username: " + currentUser.getUsername())) {
+                if (line.contains("Username: " + user.getUsername())) {
                     imageCount++;
                 }
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
-        currentUser.setPostCount(imageCount);
+       user.setPostCount(imageCount);
     }
 
-    /**
-     * Reads and sets the following and followers count for the specified user.
-     *
-     * @param currentUser The user whose following and followers count needs to be set.
-     */
-    public void readAndSetFollowing(User currentUser) {
+    public void readAndSetFollowing(User user) {
         int followingCount = 0;
 
         try {
             PreparedStatement preparedStatement = conn.prepareStatement("SELECT COUNT(username_followed) AS result FROM followers WHERE username_followed = ? ");
 
-            preparedStatement.setString(1, currentUser.getUsername());
+            preparedStatement.setString(1, user.getUsername());
 
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 while (resultSet.next()) {
@@ -62,19 +56,19 @@ public class ProfileDetailsReader {
                 }
             }
 
-            currentUser.setFollowingCount(followingCount);
+            user.setFollowingCount(followingCount);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public void readAndSetFollowed(User currentUser) {
+    public void readAndSetFollowed(User user) {
         int followersCount = 0;
 
         try {
             PreparedStatement preparedStatement = conn.prepareStatement("SELECT COUNT(username_following) AS result FROM followers WHERE username_following = ? ");
 
-            preparedStatement.setString(1, currentUser.getUsername());
+            preparedStatement.setString(1, user.getUsername());
 
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 while (resultSet.next()) {
@@ -82,19 +76,14 @@ public class ProfileDetailsReader {
                 }
             }
 
-            currentUser.setFollowersCount(followersCount);
+            user.setFollowersCount(followersCount);
 
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
     }
-
-        /**
-     * Reads and sets the bio for the specified user.
-     *
-     * @param currentUser The user whose bio needs to be read and set.
-     */
-    public void bioReader(User currentUser) {
+    //TODO baza danych!
+    public void bioReader(User user) {
         String bio = "";
         // Read the user's bio from credentials.txt
         Path bioDetailsFilePath = pathFile.credentialsPath();
@@ -102,7 +91,7 @@ public class ProfileDetailsReader {
             String line;
             while ((line = bioDetailsReader.readLine()) != null) {
                 String[] parts = line.split(":");
-                if (parts[0].equals(currentUser.getUsername()) && parts.length >= 3) {
+                if (parts[0].equals(user.getUsername()) && parts.length >= 3) {
                     bio = parts[2];
                     break; // Exit the loop once the matching bio is found
                 }
@@ -110,6 +99,6 @@ public class ProfileDetailsReader {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        currentUser.setBio(bio);
+        user.setBio(bio);
     }
 }

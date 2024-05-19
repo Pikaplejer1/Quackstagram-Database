@@ -9,39 +9,16 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 
-/**
- * Handles reading and updating details related to images in the application.
- */
 public class ImageDetailsReader {
 
     protected final FilePathInstance pathFile = FilePathInstance.getInstance();
 
-    /**
-     * Retrieves the current user's username.
-     *
-     * @return The username of the currently logged-in user.
-     */
-    protected String getCurrentUser() {
-        String currentUser = "";
-        try {
-            currentUser = Files.lines(pathFile.usersPath())
-                    .findFirst()
-                    .orElse("")
-                    .split(":")[0]
-                    .trim();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return currentUser;
-    }
-    /**
-     * Creates sample data for displaying images posted by followed users.
-     *
-     * @return An array of string arrays representing image data.
-     */
+    User currentUser = User.getInstance();
+
+    //TODO nie mam pojecia co to gowno robi
     public String[][] createSampleData() {
-        String currentUser = getCurrentUser();
-        String followedUsers = getFollowedUsers(currentUser);
+        String current = currentUser.getUsername();
+        String followedUsers = getFollowedUsers(current);
 
         String[][] tempData = new String[100][]; // Assuming a maximum of 100 posts
         int count = 0;
@@ -71,6 +48,7 @@ public class ImageDetailsReader {
         return sampleData;
     }
 
+    //TODO zamienic na czytanie z bazy danych chyba ze od razu tam gdzie potrzebne to do wyjebania
     private String findImagePath(String imageID) {
         String[] extensions = {".png", ".jpg", ".jpeg"};
         for (String ext : extensions) {
@@ -83,12 +61,7 @@ public class ImageDetailsReader {
         return null; // or a default image path
     }
 
-    /**
-     * Extracts the image ID from a given file path.
-     *
-     * @param path The file path of the image.
-     * @return The image ID extracted from the file path.
-     */
+    //TODO po co to?
     protected String extractImageId(String path) {
         String regex = "img/uploaded/(.*)\\..*";
         java.util.regex.Pattern pattern = java.util.regex.Pattern.compile(regex);
@@ -99,12 +72,9 @@ public class ImageDetailsReader {
         }
         return null;
     }
-    /**
-     * Retrieves a string containing usernames of users followed by the current user.
-     *
-     * @param currentUser The username of the current user.
-     * @return A string of usernames separated by spaces.
-     */
+
+    //TODO jesli wgl potrzebne to juz istnieje w profileDetailsManager
+
     protected String getFollowedUsers(String currentUser) {
         String followedUsers = "";
         try {
@@ -119,12 +89,7 @@ public class ImageDetailsReader {
         return followedUsers;
     }
 
-    /**
-     * Updates the image details file with new content.
-     *
-     * @param detailsPath The path to the image details file.
-     * @param newContent  The content to be written to the file.
-     */
+    //TODO chyba do usuniecia
     protected void updateImageDetailsFile(Path detailsPath, String newContent) {
         try (BufferedWriter writer = Files.newBufferedWriter(detailsPath)) {
             writer.write(newContent);
@@ -133,20 +98,6 @@ public class ImageDetailsReader {
         }
     }
 
-    /**
-     * Records a like action in the notifications file.
-     *
-     * @param imageOwner The username of the owner of the image.
-     * @param currentUser The username of the current user who liked the image.
-     * @param imageId The ID of the image that was liked.
-     * @param timestamp The timestamp of when the like occurred.
-     */
-    protected void recordLikeInNotifications(String imageOwner, String currentUser, String imageId, String timestamp) {
-        String notification = String.format("%s; %s; %s; %s\n", imageOwner, currentUser, imageId, timestamp);
-        try (BufferedWriter notificationWriter = Files.newBufferedWriter(Paths.get("data", "notifications.txt"), StandardOpenOption.CREATE, StandardOpenOption.APPEND)) {
-            notificationWriter.write(notification);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+
+
 }

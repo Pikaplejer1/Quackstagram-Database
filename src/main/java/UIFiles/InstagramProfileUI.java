@@ -137,7 +137,7 @@ public class InstagramProfileUI extends BaseUI {
     }
 
 
-
+//TODO a to nie jest po prostu upload?
     private JLabel createProfileImage(User currentUser) {
         String[] possibleExtensions = {".png", ".jpg", ".jpeg", ".gif"};
         ImageIcon profileIcon = null;
@@ -213,6 +213,8 @@ public class InstagramProfileUI extends BaseUI {
 
         refresh();
     }
+
+    //TODO jakos trzeba zdjecia wyswietlic
     private void displayUserImages(){
 
         Path imageDir = Paths.get("img", "uploaded");

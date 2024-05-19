@@ -1,59 +1,103 @@
 package Notifications;
+
+import Database.DatabaseInstance;
 import MainFiles.FilePathInstance;
+import MainFiles.User;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.sql.*;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Reads and processes notification data for the current user.
- */
 public class NotificationsReader {
-    private String currentUsername;
-    private final FilePathInstance pathFile = FilePathInstance.getInstance();
+    DatabaseInstance database = DatabaseInstance.getInstance("jdbc:mysql://localhost:3306/Quackstagram","root","julia");
+    Connection conn = database.getConn();
+    User currentUser = User.getInstance();
 
-    /**
-     * Constructor for NotificationsReader.
-     * Initializes the reader and reads the current user's username.
-     */
-    public NotificationsReader() {
-        readCurrentUsername();
-    }
+    public List<String> readNotifications() {
 
-    /**
-     * Reads the current user's username from the users file.
-     */
-    private void readCurrentUsername() {
-        try (BufferedReader reader = Files.newBufferedReader(pathFile.usersPath())) {
-            String line = reader.readLine();
-            if (line != null) {
-                currentUsername = line.split(":")[0].trim();
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+        String query = "SELECT username_send, timestamp, type FROM Notifications WHERE username_received = ?";
 
-    /**
-     * Reads and returns a list of notifications relevant to the current user.
-     *
-     * @return A list of string arrays, each representing a notification's details.
-     */
-    public List<String[]> readNotifications() {
-        List<String[]> notifications = new ArrayList<>();
-        try (BufferedReader reader = Files.newBufferedReader(pathFile.notificationsPath())) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                String[] parts = line.split(";");
-                if (parts[0].trim().equals(currentUsername)) {
-                    notifications.add(parts);
+        ArrayList<String> notifications = new ArrayList<>();
+
+        try (PreparedStatement statement = conn.prepareStatement(query)) {
+
+            statement.setString(1, currentUser.getUsername());
+
+            try (ResultSet resultSet = statement.executeQuery()) {
+
+                while (resultSet.next()) {
+                    String type = resultSet.getString("type");
+                    String username_send = resultSet.getString("username_send");
+                    Timestamp timestamp = resultSet.getTimestamp("timestamp");
+
+                    String notify = username_send;
+
+                    if (type.equals("follow")) {
+
+                        notify += " followed you - ";
+
+                    } else if (type.equals("like")) {
+
+                        notify += " liked your post - ";
+
+                    } else {
+                        System.out.println("wrong type of notification!");
+                        continue; // Skip this notification
+                    }
+
+                    notify += calculateTime(timestamp);
+                    notifications.add(notify);
                 }
+            } catch (SQLException e) {
+                e.printStackTrace();
+                System.out.println("SQL query went wrong.");
             }
-        } catch (IOException e) {
-            e.printStackTrace();
+
+            return notifications;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
-        return notifications;
     }
+
+    private String calculateTime(Timestamp timestamp) {
+
+        StringBuilder builder = new StringBuilder();
+
+        Instant timestampInstant = timestamp.toInstant();
+        Instant currentTime = Instant.now();
+
+        Duration duration = Duration.between(timestampInstant, currentTime);
+
+        long days = duration.toDays();
+        long hours = duration.toHours() % 24;
+        long minutes = duration.toMinutes() % 60;
+        long seconds = duration.getSeconds() % 60;
+
+        if (days > 0) {
+            builder.append(days).append(" days ");
+        }
+        if (hours > 0) {
+            builder.append(hours).append(" hours ");
+        }
+        if (minutes > 0) {
+            builder.append(minutes).append(" minutes ");
+        }
+        if (seconds > 0) {
+            builder.append(seconds).append(" seconds ");
+        }
+
+        if (builder.length() > 0) {
+            builder.append("ago.");
+        } else {
+            builder.append("just now.");
+        }
+
+        return builder.toString().trim();
+    }
+
 }

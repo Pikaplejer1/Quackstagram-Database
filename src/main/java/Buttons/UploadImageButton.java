@@ -50,6 +50,7 @@ public class UploadImageButton extends JButton implements ActionListener {
         uploadAction();
     }
 
+    //TODO
     /**
      * Handles the action of uploading a profile picture.
      * Lets the user select an image file, saves it, and updates the image preview.

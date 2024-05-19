@@ -2,6 +2,7 @@ package MainFiles;
 
 import Buttons.*;
 import Database.DatabaseInstance;
+import Notifications.NotificationsCreator;
 
 import javax.swing.*;
 import java.sql.*;
@@ -14,6 +15,8 @@ import java.time.Instant;
 public class FollowManager{
     DatabaseInstance database = DatabaseInstance.getInstance("jdbc:mysql://localhost:3306/Quackstagram","root","julia");
     Connection conn = database.getConn();
+    NotificationsCreator creator = new NotificationsCreator();
+    User currentUser = User.getInstance();
 
     public JButton decideType(User userToTakActionOn, JFrame window){
 
@@ -28,17 +31,16 @@ public class FollowManager{
         FollowButton followingButton = new FollowButton(following);
 
         boolean thisUser = isCurrentUser(userToTakActionOn);
-        String currentUser = getCurrentUsername();
 
         if (thisUser) {
 
             finalButton = editProfileButton.createButton(userToTakActionOn, window);
 
-        } else if ((!thisUser )&& (isAlreadyFollowed(currentUser, userToTakActionOn.getUsername()))) {
+        } else if ((!thisUser )&& (isAlreadyFollowed(currentUser.getUsername(), userToTakActionOn.getUsername()))) {
 
             finalButton = followingButton.createButton(userToTakActionOn, window);
 
-        } else if ((!thisUser) && (!isAlreadyFollowed(currentUser, userToTakActionOn.getUsername()))){
+        } else if ((!thisUser) && (!isAlreadyFollowed(currentUser.getUsername(), userToTakActionOn.getUsername()))){
 
             finalButton = followButton.createButton(userToTakActionOn,window);
 
@@ -49,40 +51,15 @@ public class FollowManager{
          return finalButton;
     }
 
-    public void handleFollowAction(String usernameToFollow){
-        String currentUserUsername = getCurrentUsername();
-        if(!currentUserUsername.isEmpty()){
-            processFollowing(currentUserUsername, usernameToFollow);
-        }
-    }
 
-    public void handleUnFollowAction(String usernameToUnFollow){
-
-        String currentUserUsername = getCurrentUsername();
-
-        if(!currentUserUsername.isEmpty()){
-            processUnFollowing(currentUserUsername, usernameToUnFollow);
-        }
-    }
-
-    private void processUnFollowing(String currentUsername, String usernameToUnFollow) {
-        updateUnFollowingContent(currentUsername, usernameToUnFollow);
-        System.out.println("Succesfully "+ currentUsername +" unfollowed " + usernameToUnFollow);
-    }
-
-    private void processFollowing(String currentUsername, String usernameToFollow) {
-        updateFollowingContent(currentUsername, usernameToFollow);
-        System.out.println("Succesfully "+ currentUsername +" followed " + usernameToFollow);
-    }
-
-    private void updateUnFollowingContent(String currentUsername, String usernameToUnFollow) {
+    public void handleUnFollowAction(String usernameToUnFollow) {
         try {
 
             PreparedStatement preparedStatement = conn.prepareStatement(
                     "DELETE FROM followers WHERE username_followed = ? AND username_following = ?");
 
             preparedStatement.setString(1, usernameToUnFollow);
-            preparedStatement.setString(2, currentUsername);
+            preparedStatement.setString(2, currentUser.getUsername());
 
             int rowsAffected = preparedStatement.executeUpdate();
 
@@ -97,7 +74,7 @@ public class FollowManager{
         }
     }
 
-    private void updateFollowingContent(String currentUsername, String usernameToFollow) {
+    public void handleFollowAction(String usernameToFollow) {
 
         Instant timestamp = Instant.now();
 
@@ -106,7 +83,7 @@ public class FollowManager{
                     "INSERT INTO followers (username_followed, username_following, timestamp)" +
                     "VALUES (?, ?, ?)");
             preparedStatement.setString(1, usernameToFollow);
-            preparedStatement.setString(2, currentUsername);
+            preparedStatement.setString(2, currentUser.getUsername());
             preparedStatement.setTimestamp(3, Timestamp.from(timestamp));
 
             int rowsAffected = preparedStatement.executeUpdate();
@@ -120,9 +97,11 @@ public class FollowManager{
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+
+        creator.newNotification( usernameToFollow, "follow");
     }
 
-    public boolean isAlreadyFollowed(String currentUser, String userToFollow){
+    private boolean isAlreadyFollowed(String currentUser, String userToFollow){
 
         try {
             PreparedStatement preparedStatement = conn.prepareStatement(
@@ -144,26 +123,8 @@ public class FollowManager{
         return false;
     }
 
-    private String getCurrentUsername(){
+    private boolean isCurrentUser(User userToTakeActionOn) {
 
-        String currentUserUsername = "";
-
-        return currentUserUsername;
-    }
-
-    public String loggedInUsername() {
-        String loggedInUsername = "";
-
-
-        return loggedInUsername;
-    }
-
-    public boolean isCurrentUser(User currentUser) {
-
-        boolean isCurrentUser = false;
-
-
-
-        return isCurrentUser;
+        return userToTakeActionOn.getUsername().equals(currentUser.getUsername());
     }
 }
