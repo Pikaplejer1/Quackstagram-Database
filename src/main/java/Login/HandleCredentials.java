@@ -3,10 +3,9 @@ package Login;
 import Database.GetCredentials;
 import MainFiles.*;
 import UIFiles.*;
-import Utils.DataType;
+import Utils.CredentialsDataType;
 
 import javax.swing.*;
-import java.io.*;
 
 /**
  * Manages the sign-in process by verifying credentials and handling the login outcome.
@@ -54,7 +53,7 @@ public class HandleCredentials {
      */
     private Boolean verifyCredentials(String username, String password) {
         GetCredentials getCredentials = new GetCredentials();
-        if(password.equals(getCredentials.getUserData(username,DataType.PASSWORD))){
+        if(password.equals(getCredentials.getUserData(username, CredentialsDataType.PASSWORD))){
             String bio = getBio(username);
             User user = User.getInstance(username,bio,password);
             return true;
@@ -64,6 +63,6 @@ public class HandleCredentials {
 
     private String getBio(String username) {
         GetCredentials getBio = new GetCredentials();
-        return getBio.getUserData(username, DataType.BIO);
+        return getBio.getUserData(username, CredentialsDataType.BIO);
     }
 }

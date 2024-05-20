@@ -1,5 +1,6 @@
 package Buttons;
 
+import Database.UpdateCredentials;
 import MainFiles.User;
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -50,7 +51,6 @@ public class UploadImageButton extends JButton implements ActionListener {
         uploadAction();
     }
 
-    //TODO
     /**
      * Handles the action of uploading a profile picture.
      * Lets the user select an image file, saves it, and updates the image preview.
@@ -70,11 +70,15 @@ public class UploadImageButton extends JButton implements ActionListener {
                 // Construct the final file name and path
                 String fileExtension = ImageUploadUI.getFileExtension(newProfilePicture);
                 newFileName = user.getUsername() + "." + fileExtension;
+                String relativePath = Paths.get("img", "storage", "profile", newFileName).toString();
                 destPath = Paths.get("img", "storage", "profile", newFileName);
                 System.out.println(destPath);
 
                 // Directly copy the file to the destination path
                 Files.copy(newProfilePicture.toPath(), destPath, StandardCopyOption.REPLACE_EXISTING);
+
+                UpdateCredentials updatePhotoDir = new UpdateCredentials();
+                updatePhotoDir.updateProfilePicture(relativePath, User.getInstance().getUsername());
 
                 // Update the image preview
                 ImageIcon imageIcon = new ImageIcon(destPath.toString());

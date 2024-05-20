@@ -43,7 +43,7 @@ public class InstagramProfileUI extends BaseUI {
 
         profileDetailsReader.readAndSetFollowing(user);
         profileDetailsReader.readAndSetFollowed(user);
-        ProfileDetailsReader.readImageDetails(user);
+        profileDetailsReader.readImageDetails(user);
         profileDetailsReader.bioReader(user);
 
         System.out.println("Bio for " + user.getUsername() + ": " + user.getBio());
@@ -137,7 +137,6 @@ public class InstagramProfileUI extends BaseUI {
     }
 
 
-//TODO a to nie jest po prostu upload?
     private JLabel createProfileImage(User currentUser) {
         String[] possibleExtensions = {".png", ".jpg", ".jpeg", ".gif"};
         ImageIcon profileIcon = null;
@@ -214,7 +213,6 @@ public class InstagramProfileUI extends BaseUI {
         refresh();
     }
 
-    //TODO jakos trzeba zdjecia wyswietlic
     private void displayUserImages(){
 
         Path imageDir = Paths.get("img", "uploaded");

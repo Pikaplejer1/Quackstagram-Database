@@ -1,5 +1,6 @@
 package UIFiles;
 
+import Database.PostDatabase;
 import MainFiles.*;
 
 import javax.imageio.ImageIO;
@@ -193,7 +194,7 @@ public class QuackstagramHomeUI extends BaseUI {
         return spacingPanel;
     }
 
-
+    //TODO ?????????
     private void displayImage(String[] postData) {
         imageViewPanel.removeAll();
 
@@ -252,24 +253,10 @@ public class QuackstagramHomeUI extends BaseUI {
         cardLayout.show(cardPanel, "ImageView");
     }
 
-    //TODO nie wiem
     private void refreshDisplayImage(String[] postData, String imageId) {
-        try (BufferedReader reader = Files.newBufferedReader(pathFile.imageDetailsPath())) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                if (line.contains("ImageID: " + imageId)) {
-                    String likes = line.split(", ")[4].split(": ")[1];
-                    postData[2] = "Likes: " + likes;
-                    break;
-                }
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        PostDatabase postDatabase = new PostDatabase();
+        postData = postDatabase.getPostData(postData,imageId);
         displayImage(postData);
     }
 }
-
-
-
 

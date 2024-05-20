@@ -1,7 +1,10 @@
 package UIFiles;
 
+import Database.GetCredentials;
 import MainFiles.FilePathInstance;
 import MainFiles.User;
+import Utils.PostDataType;
+
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
@@ -132,27 +135,12 @@ public class ExploreUI extends BaseUI {
         refresh();
     }
 
-    //TODO co to lol?
     private void extractImageDetails(String imagePath ){
-
-        // Extract image ID from the imagePath
-        String imageId = new File(imagePath).getName().split("\\.")[0];
-
-        Path detailsPath = pathFile.imageDetailsPath();
-        try (Stream<String> lines = Files.lines(detailsPath)) {
-            String details = lines.filter(line -> line.contains("ImageID: " + imageId)).findFirst().orElse("");
-            if (!details.isEmpty()) {
-                String[] parts = details.split(", ");
-                username = parts[1].split(": ")[1];
-                bio = parts[2].split(": ")[1];
-                System.out.println(bio+"this is where you get an error "+parts[3]);
-                timestampString = parts[3].split(": ")[1];
-                likes = Integer.parseInt(parts[4].split(": ")[1]);
-            }
-        } catch (IOException ex) {
-            ex.printStackTrace();
-            // Handle exception
-        }
+        GetCredentials getPostData = new GetCredentials();
+        username = getPostData.getPostData(imagePath, PostDataType.USERNAME);
+        bio = getPostData.getPostData(imagePath, PostDataType.BIO);
+        timestampString = getPostData.getPostData(imagePath,PostDataType.TIMESTAMP);
+        likes = Integer.parseInt(getPostData.getPostData(imagePath, PostDataType.LIKES));
     }
 
 
@@ -243,8 +231,6 @@ public class ExploreUI extends BaseUI {
 
         return usernameLabel;
     }
-
-    //TODO troche chujowe to liczenie czasu - zrobilam takie dla powiadomien ale musi byc typ danej timestamp a nie string
     private static JLabel createTimeLabel(String timestampString) {
         String timeSincePosting = calculateTimeSincePosting(timestampString);
         JLabel timeLabel = new JLabel(timeSincePosting);

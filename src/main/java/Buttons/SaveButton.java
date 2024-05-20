@@ -1,5 +1,6 @@
 package Buttons;
 
+import Database.UpdateCredentials;
 import Login.CreateUser;
 import MainFiles.FilePathInstance;
 import MainFiles.User;
@@ -63,8 +64,7 @@ public class SaveButton extends JButton implements ActionListener {
         try {
             // Update user's bio
             User updatedUser = new User(user.getUsername(), bioTextArea.getText(), null);
-            createUser.updateUser(updatedUser);
-
+            createUser.updateUser(updatedUser,User.getInstance().getUsername());
             // Display updated profile UI
             SwingUtilities.invokeLater(() -> {
                 InstagramProfileUI profileUI = new InstagramProfileUI();

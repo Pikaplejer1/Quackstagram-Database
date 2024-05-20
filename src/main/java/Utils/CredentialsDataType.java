@@ -1,6 +1,6 @@
 package Utils;
 
-public enum DataType {
+public enum CredentialsDataType {
     PASSWORD("password"),
     BIO("bio"),
     USERNAME("username");
@@ -8,7 +8,7 @@ public enum DataType {
 
     private final String columnName;
 
-    DataType(String columnName) {
+    CredentialsDataType(String columnName) {
         this.columnName = columnName;
     }
 

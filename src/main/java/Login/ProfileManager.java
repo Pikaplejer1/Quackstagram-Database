@@ -3,7 +3,7 @@ import java.io.*;
 
 import Database.GetCredentials;
 import MainFiles.FilePathInstance;
-import Utils.DataType;
+import Utils.CredentialsDataType;
 
 /**
  * Manages profile-related functionalities such as registration and checking if a username exists.
@@ -52,7 +52,7 @@ public class ProfileManager extends ProfilePictureManager {
      */
     public boolean isValidInput(String username) {
         GetCredentials getUsername = new GetCredentials();
-        return username.equals(getUsername.getUserData(username, DataType.USERNAME));
+        return username.equals(getUsername.getUserData(username, CredentialsDataType.USERNAME));
     }
 
     /**

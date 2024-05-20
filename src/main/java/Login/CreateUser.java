@@ -30,44 +30,15 @@ public class CreateUser {
         }
     }
 
-    //TODO
     /**
      * Updates the bio of an existing user.
      * Reads the credentials file and writes the updated information to a temporary file,
      * which is then renamed to the original file name.
      *
-     * @param user The user object with updated information.
+     * @param updatedUser The user object with updated information.
      */
-    public void updateUser(User user){
-        String username = user.getUsername();
-        String bio = user.getBio();
-        String previousPassword = "";
-        File inputFile = new File(pathFile.credentialsNamePath());
-        File tempFile = new File(inputFile.getAbsolutePath() + ".tmp");
-
-        try (BufferedReader reader = new BufferedReader(new FileReader(inputFile));
-             BufferedWriter writer = new BufferedWriter(new FileWriter(tempFile))) {
-
-            String line;
-
-            while ((line = reader.readLine()) != null) {
-                String[] credentials = line.split(":");
-                if (credentials[0].equals(username)) {
-                    previousPassword = credentials[1];
-                }else{
-                    writer.write(line + System.lineSeparator());
-                }
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-            return;
-        }
-
-        // Replace the old credentials file with the updated file
-        inputFile.delete();
-        tempFile.renameTo(inputFile);
-
-        // Save the updated credentials
-        saveCredentials(username, previousPassword, bio);
+    public void updateUser(User updatedUser, String prevUser){
+        UpdateCredentials updateUser = new UpdateCredentials();
+        updateUser.updateUser(updatedUser, prevUser);
     }
 }

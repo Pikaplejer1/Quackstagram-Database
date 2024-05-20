@@ -1,5 +1,7 @@
 package Database;
 
+import MainFiles.User;
+
 import java.sql.*;
 
 public class UpdateCredentials {
@@ -20,4 +22,35 @@ public class UpdateCredentials {
             throw new RuntimeException(e);
         }
     }
+
+    public void updateUser(User user, String prevUsername){
+        String username = user.getUsername();
+        String bio = user.getBio();
+        try{
+            PreparedStatement preparedStatement = conn.prepareStatement(
+                    "update User" +
+                    "set username = ?," +
+                    "set bio = ?"+
+                    "where username = ?");
+            preparedStatement.setString(1,username);
+            preparedStatement.setString(2,bio);
+            preparedStatement.setString(3,prevUsername);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void updateProfilePicture(String dir, String username){
+        try{
+            PreparedStatement preparedStatement = conn.prepareStatement(
+                    "update User" +
+                            "set pfp_dir = ? " +
+                            "where username = ?");
+            preparedStatement.setString(1,dir);
+            preparedStatement.setString(2,username);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 }
