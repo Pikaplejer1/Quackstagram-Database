@@ -32,7 +32,7 @@ public class FilePathInstance {
 
     public Path logoPath(){
 
-        Path logoFilePath = Paths.get("img", "logos/DACS.png");
+        Path logoFilePath = Paths.get( "logos/DACS.png");
         return logoFilePath;
     }
 
@@ -62,31 +62,31 @@ public class FilePathInstance {
 
     public Path addIconPath(){
 
-        Path addIconFilePath = Paths.get("img", "icons/add.png");
+        Path addIconFilePath = Paths.get( "icons/add.png");
         return addIconFilePath;
     }
 
     public Path heartIconPath(){
 
-        Path heartIconFilePath = Paths.get("img", "icons/heart.png");
+        Path heartIconFilePath = Paths.get( "icons/heart.png");
         return heartIconFilePath;
     }
 
     public Path homeIconPath(){
 
-        Path homeIconFilePath = Paths.get("img", "icons/home.png");
+        Path homeIconFilePath = Paths.get( "icons/home.png");
         return homeIconFilePath;
     }
 
     public Path profileIconPath(){
 
-        Path profileIconFilePath = Paths.get("img", "icons/profile.png");
+        Path profileIconFilePath = Paths.get( "icons/profile.png");
         return profileIconFilePath;
     }
 
     public Path searchIconPath(){
 
-        Path searchIconFilePath = Paths.get("img", "icons/search.png");
+        Path searchIconFilePath = Paths.get( "icons/search.png");
         return searchIconFilePath;
     }
 

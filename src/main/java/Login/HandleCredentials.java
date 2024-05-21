@@ -12,6 +12,7 @@ import javax.swing.*;
  */
 public class HandleCredentials {
     private final LoginResultListener listener;
+    User user;
 
     /**
      * Constructor for HandleCredentials.
@@ -34,7 +35,7 @@ public class HandleCredentials {
         if (verifyCredentials(username, password)) {
             System.out.println("It worked");
             SwingUtilities.invokeLater(() -> {
-                InstagramProfileUI profileUI = new InstagramProfileUI();
+                InstagramProfileUI profileUI = new InstagramProfileUI(user);
                 profileUI.setVisible(true);
                 listener.onLoginSuccess();
             });
@@ -55,7 +56,7 @@ public class HandleCredentials {
         GetCredentials getCredentials = new GetCredentials();
         if(password.equals(getCredentials.getUserData(username, CredentialsDataType.PASSWORD))){
             String bio = getBio(username);
-            User user = User.getInstance(username,bio,password);
+            user = User.getInstance(username,bio,password);
             return true;
         }
         return false;

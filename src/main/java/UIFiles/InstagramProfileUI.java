@@ -1,5 +1,6 @@
 package UIFiles;
 
+import Database.DatabaseInstance;
 import MainFiles.FollowManager;
 import MainFiles.User;
 import MainFiles.ProfileDetailsReader;
