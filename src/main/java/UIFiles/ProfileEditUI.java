@@ -60,8 +60,6 @@ public class ProfileEditUI extends BaseUI {
         JScrollPane bioScrollPane = createScrollPane(bioTextArea);
         contentPanel.add(bioScrollPane);
 
-        ButtonFactory factory = new ButtonFactory();
-
         // Upload button
         UploadImageButton uploadButton = new UploadImageButton("Upload image", user, imagePreviewLabel);
         contentPanel.add(uploadButton);

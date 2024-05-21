@@ -2,8 +2,8 @@ package Utils;
 
 public enum PostDataType {
     USERNAME("username"),
-    BIO("bio"),
-    TIMESTAMP("timestamp"),
+    BIO("post_desc"),
+    TIMESTAMP("post_timestamp"),
     LIKES("likes");
 
     private final String columnName;

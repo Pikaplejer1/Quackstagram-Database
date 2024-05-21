@@ -32,7 +32,7 @@ public class ProfileDetailsReader {
         int followingCount = 0;
 
         try {
-            PreparedStatement preparedStatement = conn.prepareStatement("SELECT COUNT(username_followed) AS result FROM followers WHERE username_followed = ? ");
+            PreparedStatement preparedStatement = conn.prepareStatement("SELECT COUNT(username_followed) AS result FROM followers WHERE username_following = ? ");
 
             preparedStatement.setString(1, user.getUsername());
 
@@ -52,7 +52,7 @@ public class ProfileDetailsReader {
         int followersCount = 0;
 
         try {
-            PreparedStatement preparedStatement = conn.prepareStatement("SELECT COUNT(username_following) AS result FROM followers WHERE username_following = ? ");
+            PreparedStatement preparedStatement = conn.prepareStatement("SELECT COUNT(username_following) AS result FROM followers WHERE username_followed = ? ");
 
             preparedStatement.setString(1, user.getUsername());
 

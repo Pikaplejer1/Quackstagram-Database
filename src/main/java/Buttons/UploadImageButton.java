@@ -70,8 +70,8 @@ public class UploadImageButton extends JButton implements ActionListener {
                 // Construct the final file name and path
                 String fileExtension = ImageUploadUI.getFileExtension(newProfilePicture);
                 newFileName = user.getUsername() + "." + fileExtension;
-                String relativePath = Paths.get("img", "storage", "profile", newFileName).toString();
-                destPath = Paths.get("img", "storage", "profile", newFileName);
+                String relativePath = Paths.get("pfp", newFileName).toString();
+                destPath = Paths.get("pfp", newFileName);
                 System.out.println(destPath);
 
                 // Directly copy the file to the destination path

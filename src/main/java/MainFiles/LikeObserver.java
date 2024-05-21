@@ -25,16 +25,12 @@ public class LikeObserver implements Observer {
         //set likes label
 
 
-        if (!likeManager.isAlreadyLiked(postId)) {
-
-            likeManager.handleLikeAction(postId); // Handles like action
-
-        } else if (likeManager.isAlreadyLiked(postId)) {
+        if (likeManager.isAlreadyLiked(postId)) {
 
             likeManager.handleUnlikeAction(postId); // Handles unlike action
 
         } else {
-            System.out.println("Like is not working");
+            likeManager.handleLikeAction(postId); // Handles unlike action
         }
 
         int likes = likeManager.countLikes(postId);

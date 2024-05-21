@@ -20,7 +20,7 @@ public class NotificationsReader {
 
     public List<String> readNotifications() {
 
-        String query = "SELECT username_send, timestamp, type FROM Notifications WHERE username_received = ?";
+        String query = "SELECT username_send, timestamp, type FROM Notification WHERE username_received = ?";
 
         ArrayList<String> notifications = new ArrayList<>();
 

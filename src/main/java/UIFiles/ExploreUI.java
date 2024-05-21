@@ -86,29 +86,35 @@ public class ExploreUI extends BaseUI {
     }
 
     public void loadImages(JPanel imageGridPanel) {
+        File postsDir = new File("posts");
 
-        File imageDir = new File("img/uploaded");
-
-        if (imageDir.exists() && imageDir.isDirectory()) {
-
-            File[] imageFiles = imageDir.listFiles((dir, name) -> name.matches(".*\\.(png|jpg|jpeg)"));
-            if (imageFiles != null) {
-
-                for (File imageFile : imageFiles) {
-
-                    ImageIcon imageIcon = new ImageIcon(new ImageIcon(imageFile.getPath()).getImage().getScaledInstance(IMAGE_SIZE, IMAGE_SIZE, Image.SCALE_SMOOTH));
-                    JLabel imageLabel = new JLabel(imageIcon);
-                    imageLabel.addMouseListener(new MouseAdapter() {
-                        @Override
-                        public void mouseClicked(MouseEvent e) {
-                            displayImage(imageFile.getPath()); // Call method to display the clicked image
-                        }
-                    });
-                    imageGridPanel.add(imageLabel);
+        if (postsDir.exists() && postsDir.isDirectory()) {
+            File[] userDirs = postsDir.listFiles(File::isDirectory);
+            if (userDirs != null) {
+                for (File userDir : userDirs) {
+                    loadUserImages(userDir, imageGridPanel);
                 }
             }
         }
     }
+
+    private void loadUserImages(File userDir, JPanel imageGridPanel) {
+        File[] imageFiles = userDir.listFiles((dir, name) -> name.matches(".*\\.(png|jpg|jpeg)"));
+        if (imageFiles != null) {
+            for (File imageFile : imageFiles) {
+                ImageIcon imageIcon = new ImageIcon(new ImageIcon(imageFile.getPath()).getImage().getScaledInstance(IMAGE_SIZE, IMAGE_SIZE, Image.SCALE_SMOOTH));
+                JLabel imageLabel = new JLabel(imageIcon);
+                imageLabel.addMouseListener(new MouseAdapter() {
+                    @Override
+                    public void mouseClicked(MouseEvent e) {
+                        displayImage(imageFile.getPath()); // Call method to display the clicked image
+                    }
+                });
+                imageGridPanel.add(imageLabel);
+            }
+        }
+    }
+
 
     private static JPanel createSearchPanel() {
         JTextField searchField = new JTextField("Search Users");
@@ -218,12 +224,12 @@ public class ExploreUI extends BaseUI {
 
     private JButton createUsernameLabel(String username) {
 
-        final String finalUsername = username;
+        String finalUsername = username;
+        User newUser = new User(finalUsername);
         JButton usernameLabel = new JButton(username);
 
         usernameLabel.addActionListener(e -> {
-            User user = User.getInstance(); // Assuming User class has a constructor that takes a username
-            InstagramProfileUI profileUI = new InstagramProfileUI();
+            InstagramProfileUI profileUI = new InstagramProfileUI(newUser);
 
             profileUI.setVisible(true);
             dispose(); // Close the current frame

@@ -7,12 +7,10 @@ import MainFiles.ProfileDetailsReader;
 import javax.swing.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.io.File;
-import java.io.IOException;
 import java.awt.*;
-import java.nio.file.*;
-import java.util.stream.Stream;
-
+import java.io.File;
+import java.sql.*;
+import java.util.ArrayList;
 
 /**
  * Provides the user interface for displaying a user's profile in Quackstagram.
@@ -20,22 +18,22 @@ import java.util.stream.Stream;
  */
 public class InstagramProfileUI extends BaseUI {
 
+    DatabaseInstance database = DatabaseInstance.getInstance("jdbc:mysql://localhost:3306/Quackstagram", "root", "julia");
+    Connection conn = database.getConn();
+
     private static final int PROFILE_IMAGE_SIZE = 80; // Adjusted size for the profile image to match UI
     private static final int GRID_IMAGE_SIZE = WIDTH / 3; // Static size for grid images
     private final JPanel contentPanel; // Panel to display the image grid or the clicked image
-    private final User user; // User object to store the current user's information
-    private final ProfileDetailsReader profileDetailsReader = new ProfileDetailsReader();
-
+    private User user; // User object to store the current user's information
+    private ProfileDetailsReader profileDetailsReader = new ProfileDetailsReader();
 
     /**
      * Constructor for InstagramProfileUI.
-     *
      */
-    public InstagramProfileUI() {
-
+    public InstagramProfileUI(User user) {
         super("");
-        this.user = User.getInstance();
-        setSize(WIDTH,HEIGHT);
+        this.user = user;
+        setSize(WIDTH, HEIGHT);
         contentPanel = new JPanel();
         setMinimumSize(new Dimension(WIDTH, HEIGHT));
         setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -72,7 +70,6 @@ public class InstagramProfileUI extends BaseUI {
      * @return The header panel JPanel.
      */
     private JPanel createHeaderPanel() {
-
         // Header Panel
         JPanel headerPanel = new JPanel();
         headerPanel.setLayout(new BoxLayout(headerPanel, BoxLayout.Y_AXIS));
@@ -87,15 +84,13 @@ public class InstagramProfileUI extends BaseUI {
         headerPanel.add(profileNameAndBioPanel);
 
         return headerPanel;
-
     }
 
-    private JPanel createTopHeaderPanel(User currentUser){
-
+    private JPanel createTopHeaderPanel(User currentUser) {
         JPanel topHeaderPanel = new JPanel(new BorderLayout(10, 0));
         topHeaderPanel.setBackground(new Color(249, 249, 249));
 
-        //Profile Image
+        // Profile Image
         JLabel profileImage = createProfileImage(currentUser);
         topHeaderPanel.add(profileImage, BorderLayout.WEST);
 
@@ -106,13 +101,12 @@ public class InstagramProfileUI extends BaseUI {
         return topHeaderPanel;
     }
 
-    private JPanel createStatsPanel(User currentUser){
-
+    private JPanel createStatsPanel(User currentUser) {
         JPanel statsPanel = new JPanel();
         statsPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 10, 0));
         statsPanel.setBackground(new Color(249, 249, 249));
-        System.out.println("Number of posts for this user"+currentUser.getPostsCount());
-        statsPanel.add(createStatLabel(Integer.toString(currentUser.getPostsCount()) , "Posts"));
+        System.out.println("Number of posts for this user: " + currentUser.getPostsCount());
+        statsPanel.add(createStatLabel(Integer.toString(currentUser.getPostsCount()), "Posts"));
         statsPanel.add(createStatLabel(Integer.toString(currentUser.getFollowersCount()), "Followers"));
         statsPanel.add(createStatLabel(Integer.toString(currentUser.getFollowingCount()), "Following"));
         statsPanel.setBorder(BorderFactory.createEmptyBorder(25, 0, 10, 0)); // Add some vertical padding
@@ -121,8 +115,7 @@ public class InstagramProfileUI extends BaseUI {
     }
 
 
-    private JPanel createProfileAndBioPanel(User currentUser){
-
+    private JPanel createProfileAndBioPanel(User currentUser) {
         JPanel profileNameAndBioPanel = new JPanel();
         profileNameAndBioPanel.setLayout(new BorderLayout());
         profileNameAndBioPanel.setBackground(new Color(249, 249, 249));
@@ -136,13 +129,12 @@ public class InstagramProfileUI extends BaseUI {
         return profileNameAndBioPanel;
     }
 
-
     private JLabel createProfileImage(User currentUser) {
         String[] possibleExtensions = {".png", ".jpg", ".jpeg", ".gif"};
         ImageIcon profileIcon = null;
 
         for (String extension : possibleExtensions) {
-            File file = new File("img/storage/profile/" + currentUser.getUsername() + extension);
+            File file = new File("pfp/" + currentUser.getUsername() + extension);
             if (file.exists()) {
                 profileIcon = new ImageIcon(new ImageIcon(file.getPath()).getImage().getScaledInstance(PROFILE_IMAGE_SIZE, PROFILE_IMAGE_SIZE, Image.SCALE_SMOOTH));
                 break;
@@ -151,6 +143,7 @@ public class InstagramProfileUI extends BaseUI {
 
         if (profileIcon == null) {
             // Handle the case where no image is found, possibly set a default image
+            profileIcon = new ImageIcon(new ImageIcon("default-profile.png").getImage().getScaledInstance(PROFILE_IMAGE_SIZE, PROFILE_IMAGE_SIZE, Image.SCALE_SMOOTH));
         }
 
         JLabel profileImage = new JLabel(profileIcon);
@@ -158,11 +151,9 @@ public class InstagramProfileUI extends BaseUI {
         return profileImage;
     }
 
-
-    private JTextArea createProfileBio(User currentUser){
-
+    private JTextArea createProfileBio(User currentUser) {
         JTextArea profileBio = new JTextArea(currentUser.getBio());
-        System.out.println("This is the bio "+currentUser.getUsername());
+        System.out.println("This is the bio: " + currentUser.getUsername());
         profileBio.setEditable(false);
         profileBio.setFont(new Font("Arial", Font.PLAIN, 12));
         profileBio.setBackground(new Color(249, 249, 249));
@@ -171,8 +162,7 @@ public class InstagramProfileUI extends BaseUI {
         return profileBio;
     }
 
-    private JLabel createProfileNameLabel(User currentUser){
-
+    private JLabel createProfileNameLabel(User currentUser) {
         JLabel profileNameLabel = new JLabel(currentUser.getUsername());
         profileNameLabel.setFont(new Font("Arial", Font.BOLD, 14));
         profileNameLabel.setBorder(BorderFactory.createEmptyBorder(10, 10, 0, 10)); // Padding on the sides
@@ -180,8 +170,7 @@ public class InstagramProfileUI extends BaseUI {
         return profileNameLabel;
     }
 
-    private JPanel createStatsFollowPanel(User currentUser){
-
+    private JPanel createStatsFollowPanel(User currentUser) {
         JPanel statsFollowPanel = new JPanel();
         statsFollowPanel.setLayout(new BoxLayout(statsFollowPanel, BoxLayout.Y_AXIS));
 
@@ -192,20 +181,17 @@ public class InstagramProfileUI extends BaseUI {
         FollowManager followManager = new FollowManager();
 
         JButton button = followManager.decideType(currentUser, this);
-        //Adds specific button based on certain conditions
+        // Adds specific button based on certain conditions
         statsFollowPanel.add(button);
 
         return statsFollowPanel;
     }
 
-
-
-
     private void initializeImageGrid() {
         contentPanel.removeAll(); // Clear existing content
         contentPanel.setLayout(new GridLayout(0, 3, 5, 5)); // Grid layout for image grid
 
-        displayUserImages();
+        displayUserImages(user.getUsername());
 
         JScrollPane scrollPane = createScrollPane(contentPanel);
         add(scrollPane, BorderLayout.CENTER); // Add the scroll pane to the center
@@ -213,34 +199,50 @@ public class InstagramProfileUI extends BaseUI {
         refresh();
     }
 
-    private void displayUserImages(){
+    public void displayUserImages(String username) {
+        ArrayList<String> imagePaths = fetchUserImagePaths(username);
 
-        Path imageDir = Paths.get("img", "uploaded");
-        try (Stream<Path> paths = Files.list(imageDir)) {
-            paths.filter(path -> path.getFileName().toString().startsWith(user.getUsername() + "_"))
-                    .forEach(path -> {
-                        ImageIcon imageIcon = new ImageIcon(new ImageIcon(path.toString()).getImage().getScaledInstance(GRID_IMAGE_SIZE, GRID_IMAGE_SIZE, Image.SCALE_SMOOTH));
-                        JLabel imageLabel = new JLabel(imageIcon);
-                        imageLabel.addMouseListener(new MouseAdapter() {
-                            @Override
-                            public void mouseClicked(MouseEvent e) {
-                                displayImage(imageIcon); // Call method to display the clicked image
-                            }
-                        });
-                        contentPanel.add(imageLabel);
-                    });
-        } catch (IOException ex) {
-            ex.printStackTrace();
-            // Handle exception (e.g., show a message or log)
+        for (String path : imagePaths) {
+            ImageIcon imageIcon = new ImageIcon(new ImageIcon(path).getImage().getScaledInstance(GRID_IMAGE_SIZE, GRID_IMAGE_SIZE, Image.SCALE_SMOOTH));
+            JLabel imageLabel = new JLabel(imageIcon);
+            imageLabel.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    displayImage(imageIcon); // Call method to display the clicked image
+                }
+            });
+            contentPanel.add(imageLabel); // Add imageLabel to the main contentPanel
         }
     }
-    private void displayImage(ImageIcon imageIcon) {
 
+    private ArrayList<String> fetchUserImagePaths(String username) {
+        ArrayList<String> imagePaths = new ArrayList<>();
+
+        String query = "SELECT post_photo_dir FROM Post WHERE username = ?";
+
+        try (PreparedStatement pstmt = conn.prepareStatement(query)) {
+            pstmt.setString(1, username);
+
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    imagePaths.add(rs.getString("post_photo_dir"));
+                }
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            // Handle exception (e.g., show a message or log)
+        }
+        return imagePaths;
+    }
+
+    private void displayImage(ImageIcon imageIcon) {
         clear();
         initializeUI();
 
         JPanel imageViewerPanel = new JPanel(new BorderLayout());
-        JButton backButtonPanel = new JButton("Back");// back button
+        JButton backButtonPanel = new JButton("Back"); // back button
         backButtonPanel.addActionListener(e -> {
             getContentPane().removeAll();
             initializeUI();
@@ -261,5 +263,15 @@ public class InstagramProfileUI extends BaseUI {
         return label;
     }
 
+    private JScrollPane createScrollPane(JPanel panel) {
+        JScrollPane scrollPane = new JScrollPane(panel);
+        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        return scrollPane;
+    }
 
+    public void refresh() {
+        revalidate();
+        repaint();
+    }
 }

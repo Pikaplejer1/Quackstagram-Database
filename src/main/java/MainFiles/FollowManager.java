@@ -98,7 +98,7 @@ public class FollowManager{
             throw new RuntimeException(e);
         }
 
-        creator.newNotification( usernameToFollow, "follow");
+        //creator.newNotification( usernameToFollow, "follow");
     }
 
     private boolean isAlreadyFollowed(String currentUser, String userToFollow){

@@ -15,7 +15,7 @@ public class FolowingDatabase {
         PreparedStatement preparedStatement = null;
         try {
             preparedStatement = conn.prepareStatement(
-                    "Select username_followed" +
+                    "Select username_followed " +
                         "From Followers " +
                             "Where username_following = ? ");
             preparedStatement.setString(1,username);

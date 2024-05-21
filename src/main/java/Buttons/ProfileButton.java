@@ -9,7 +9,7 @@ import UIFiles.InstagramProfileUI;
 
 public class ProfileButton extends JFrame implements NavigationButton {
     public void performAction(){
-        InstagramProfileUI profileUI = new InstagramProfileUI();
+        InstagramProfileUI profileUI = new InstagramProfileUI(User.getInstance());
         profileUI.setVisible(true);
     }
 }

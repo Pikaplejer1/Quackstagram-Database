@@ -96,30 +96,6 @@ public class FilePathInstance {
         return credentialsNamePath;
     }
 
-    public String followingNamePath(){
-
-        String followingNamePath = "data/following.txt";
-        return followingNamePath;
-    }
-
-    public String usersNamePath(){
-
-        String usersNamePath = "data/users.txt";
-        return usersNamePath;
-    }
-
-    public String notificationsNamePath(){
-
-        String notificationsNamePath = "data/notifications.txt";
-        return notificationsNamePath;
-    }
-
-    public String imageDetailsNamePath(){
-
-        String imageDetailsNamePath = "data/image_details.txt";
-        return imageDetailsNamePath;
-    }
-
     public  String logoIconNamePath(){
 
         String logoIconNamePath = "img/logos/DACS.png";
@@ -129,37 +105,37 @@ public class FilePathInstance {
 
     public String storageProfileNamePath(){
 
-        String storageProfileNamePath = "img/storage/profile";
+        String storageProfileNamePath = "storage/profile";
         return storageProfileNamePath;
     }
 
     public  String profileIconNamePath(){
 
-        String profileIconNamePath = "img/icons/profile.png";
+        String profileIconNamePath = "icons/profile.png";
         return profileIconNamePath;
     }
 
     public  String homeIconNamePath(){
 
-        String homeIconNamePath = "img/icons/home.png";
+        String homeIconNamePath = "icons/home.png";
         return homeIconNamePath;
     }
 
     public  String heartIconNamePath(){
 
-        String heartIconNamePath = "img/icons/heart.png";
+        String heartIconNamePath = "icons/heart.png";
         return heartIconNamePath;
     }
 
     public  String searchIconNamePath(){
 
-        String searchIconNamePath = "img/icons/search.png";
+        String searchIconNamePath = "icons/search.png";
         return searchIconNamePath;
     }
 
     public  String addIconNamePath(){
 
-        String addIconNamePath = "img/icons/add.png";
+        String addIconNamePath = "icons/add.png";
         return addIconNamePath;
     }
 

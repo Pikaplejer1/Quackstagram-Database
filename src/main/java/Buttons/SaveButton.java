@@ -67,7 +67,7 @@ public class SaveButton extends JButton implements ActionListener {
             createUser.updateUser(updatedUser,User.getInstance().getUsername());
             // Display updated profile UI
             SwingUtilities.invokeLater(() -> {
-                InstagramProfileUI profileUI = new InstagramProfileUI();
+                InstagramProfileUI profileUI = new InstagramProfileUI(updatedUser);
                 profileUI.setVisible(true);
             });
 

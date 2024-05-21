@@ -1,8 +1,10 @@
 package Database;
 
+import MainFiles.ImageLikesManager;
 import Utils.CredentialsDataType;
 import Utils.PostDataType;
 
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -18,7 +20,7 @@ public class GetCredentials {
         try {
             PreparedStatement preparedStatement = conn.prepareStatement(
                     "select " + typeOfData.getColumnName() +
-                            " from credentials " +
+                            " from User_profile " +
                             "where username = ?;");
             preparedStatement.setString(1, username);
             ResultSet resultSet = preparedStatement.executeQuery();
@@ -33,10 +35,17 @@ public class GetCredentials {
 
 
     public String getPostData(String filePath, PostDataType dataType){
-        String imageId = filePath.split("\\.")[0];
+        String imageId;
+        try {
+            ImageLikesManager manager = new ImageLikesManager();
+            imageId = manager.getPostId(filePath);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
         try {
             PreparedStatement preparedStatement = conn.prepareStatement(
-                    "SELECT u.username, u.bio, p.post_timestamp, " +
+                    "SELECT u.username, p.post_desc, p.post_timestamp, " +
                             "(SELECT COUNT(*) FROM Likes WHERE post_id = p.post_id) AS likes " +
                             "FROM User_profile u " +
                             "JOIN Post p ON u.username = p.username " +

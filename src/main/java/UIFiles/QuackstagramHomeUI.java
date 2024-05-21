@@ -7,10 +7,8 @@ import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
 
 /**
  * Provides the user interface for the home screen of Quackstagram.
@@ -21,15 +19,14 @@ public class QuackstagramHomeUI extends BaseUI {
     private static final int IMAGE_HEIGHT = 250;
     private static final Color LIKE_BUTTON_COLOR = new Color(255, 90, 95);
     private static final Color BACKGROUND_COLOR = Color.WHITE;
+    private String[] postData;
     private final FilePathInstance pathFile = FilePathInstance.getInstance();
     private CardLayout cardLayout;
     private JPanel cardPanel;
     private JPanel homePanel;
     private JPanel imageViewPanel;
-    //private User user = HandleCredentials.getMainUser();
     private ImageLikesManager likeManager;
-
-    private LikeObserver likeObserver; // Declare LikeObserver as a field
+    private LikeObserver likeObserver;
 
     /**
      * Constructor for QuackstagramHomeUI.
@@ -39,7 +36,7 @@ public class QuackstagramHomeUI extends BaseUI {
         super("Quakstagram Home");
         try {
             this.likeManager = new ImageLikesManager(); // Initialize the class field
-            this.likeObserver = new LikeObserver(); // Initialize LikeObserver
+            this.likeObserver = new LikeObserver(); // Initialize LikeObserver with the same ImageLikesManager instance
             this.likeManager.registerObserver(likeObserver); // Register LikeObserver
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -53,11 +50,21 @@ public class QuackstagramHomeUI extends BaseUI {
      * Initializes the components of the home UI.
      */
     private void initializeUI() {
-        JPanel contentPanel = createContentPanel();
-        JScrollPane scrollPane = createScrollPane(contentPanel);
-        add(scrollPane, BorderLayout.CENTER);
-        contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
-        populateContentPanel(contentPanel, likeManager.createSampleData());
+        cardLayout = new CardLayout();
+        cardPanel = new JPanel(cardLayout);
+
+        homePanel = createContentPanel();
+        JScrollPane scrollPane = createScrollPane(homePanel);
+        homePanel.setLayout(new BoxLayout(homePanel, BoxLayout.Y_AXIS));
+        populateContentPanel(homePanel, likeManager.createSampleData());
+
+        imageViewPanel = new JPanel(new BorderLayout());
+
+        cardPanel.add(scrollPane, "Home");
+        cardPanel.add(imageViewPanel, "ImageView");
+
+        add(cardPanel, BorderLayout.CENTER);
+        cardLayout.show(cardPanel, "Home");
     }
 
     /**
@@ -67,8 +74,9 @@ public class QuackstagramHomeUI extends BaseUI {
      * @param sampleData Sample data representing the image posts.
      */
     private void populateContentPanel(JPanel panel, String[][] sampleData) {
-        for (String[] postData : sampleData) {
-            JPanel itemPanel = createItemPanel(postData);
+        for (String[] postData1 : sampleData) {
+            postData = postData1;
+            JPanel itemPanel = createItemPanel(postData1);
             panel.add(itemPanel);
             panel.add(createSpacingPanel());
         }
@@ -130,7 +138,6 @@ public class QuackstagramHomeUI extends BaseUI {
         return imageLabel;
     }
 
-
     private BufferedImage resizeImage(BufferedImage originalImage) {
         double aspectRatio = (double) originalImage.getWidth() / originalImage.getHeight();
         int newWidth = IMAGE_WIDTH;
@@ -165,24 +172,18 @@ public class QuackstagramHomeUI extends BaseUI {
     }
 
     private JButton createLikeButton(String imageId, JLabel likesLabel) {
-
-
-        try {
-            ImageLikesManager likeManager = new ImageLikesManager();
-            Observer observer = new LikeObserver();
-            likeManager.registerObserver(observer);
-
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
         JButton likeButton = new JButton("❤");
         likeButton.setBackground(LIKE_BUTTON_COLOR);
         likeButton.setOpaque(true);
         likeButton.setBorderPainted(false);
         likeButton.addActionListener(e -> {
-            likeManager.notifyObservers(imageId, likesLabel);
+            likeObserver.update(imageId, likesLabel);
+            // Update the likes label immediately
+            likesLabel.setText("Likes: " + likeManager.countLikes(imageId));
             System.out.println("CLICKED LIKE");
+            // Ensure the UI is updated properly
+            likesLabel.revalidate();
+            likesLabel.repaint();
         });
         return likeButton;
     }
@@ -194,69 +195,5 @@ public class QuackstagramHomeUI extends BaseUI {
         return spacingPanel;
     }
 
-    //TODO ?????????
-    private void displayImage(String[] postData) {
-        imageViewPanel.removeAll();
 
-        String imageId = new File(postData[3]).getName().split("\\.")[0];
-        JLabel likesLabel = new JLabel(postData[2]);
-
-        JLabel fullSizeImageLabel = new JLabel();
-        fullSizeImageLabel.setHorizontalAlignment(JLabel.LEFT);
-
-        try {
-            ImageLikesManager likeManager = new ImageLikesManager();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
-        try {
-            BufferedImage originalImage = ImageIO.read(new File(postData[3]));
-            BufferedImage croppedImage = originalImage.getSubimage(0, 0, Math.min(originalImage.getWidth(), WIDTH - 20), Math.min(originalImage.getHeight(), HEIGHT - 40));
-            ImageIcon imageIcon = new ImageIcon(croppedImage);
-            fullSizeImageLabel.setIcon(imageIcon);
-        } catch (IOException ex) {
-            fullSizeImageLabel.setText("Image not found");
-        }
-
-        JPanel userPanel = new JPanel();
-        userPanel.setLayout(new BoxLayout(userPanel, BoxLayout.Y_AXIS));
-        JLabel userName = new JLabel(postData[0]);
-        userName.setFont(new Font("Arial", Font.BOLD, 18));
-        userPanel.add(userName);
-
-        JButton likeButton = new JButton("❤");
-        likeButton.setAlignmentX(Component.LEFT_ALIGNMENT);
-        likeButton.setBackground(LIKE_BUTTON_COLOR);
-        likeButton.setOpaque(true);
-        likeButton.setBorderPainted(false);
-        likeButton.addActionListener(e -> {
-            //likeManager.handleLikeAction(imageId, likesLabel);
-            refreshDisplayImage(postData, imageId);
-        });
-
-        JPanel infoPanel = new JPanel(new BorderLayout());
-        JLabel descriptionLabel = new JLabel(postData[1]);
-        likesLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
-
-        infoPanel.add(descriptionLabel, BorderLayout.WEST);
-        infoPanel.add(likesLabel, BorderLayout.CENTER);
-        infoPanel.add(likeButton, BorderLayout.EAST);
-
-        imageViewPanel.add(fullSizeImageLabel, BorderLayout.CENTER);
-        imageViewPanel.add(infoPanel, BorderLayout.SOUTH);
-        imageViewPanel.add(userPanel, BorderLayout.NORTH);
-
-        imageViewPanel.revalidate();
-        imageViewPanel.repaint();
-
-        cardLayout.show(cardPanel, "ImageView");
-    }
-
-    private void refreshDisplayImage(String[] postData, String imageId) {
-        PostDatabase postDatabase = new PostDatabase();
-        postData = postDatabase.getPostData(postData,imageId);
-        displayImage(postData);
-    }
 }
-

@@ -19,7 +19,7 @@ public class NotificationsCreator {
 
         try {
             PreparedStatement preparedStatement = conn.prepareStatement(
-                    "INSERT INTO Notifications (username_send, username_received, Timestamp, type)" +
+                    "INSERT INTO Notification (username_send, username_received, Timestamp, type)" +
                             "VALUES (?, ?, ?, ?)");
 
             preparedStatement.setString(1, currentUser.getUsername());
