@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class PostDatabase {
-    DatabaseInstance database = DatabaseInstance.getInstance("jdbc:mysql://localhost:3306/Quackstagram","root","julia");
+    DatabaseInstance database = DatabaseInstance.getInstance("jdbc:mysql://localhost:3306/Quackstagram","root","marcel");
     Connection conn = database.getConn();
     public List<String[]> getHomeUiPfp(List<String> followedUsers) {
         List<String[]> data = new ArrayList<>();

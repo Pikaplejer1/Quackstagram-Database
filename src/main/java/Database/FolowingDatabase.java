@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class FolowingDatabase {
-    DatabaseInstance database = DatabaseInstance.getInstance("jdbc:mysql://localhost:3306/Quackstagram","root","julia");
+    DatabaseInstance database = DatabaseInstance.getInstance("jdbc:mysql://localhost:3306/Quackstagram","root","marcel");
     Connection conn = database.getConn();
     public List<String> getFollowedUsers(String username){
         List<String> followedUser = new ArrayList<>();

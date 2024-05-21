@@ -12,7 +12,7 @@ import java.sql.SQLException;
 
 public class GetCredentials {
 
-    DatabaseInstance database = DatabaseInstance.getInstance("jdbc:mysql://localhost:3306/Quackstagram","root","julia");
+    DatabaseInstance database = DatabaseInstance.getInstance("jdbc:mysql://localhost:3306/Quackstagram","root","marcel");
     Connection conn = database.getConn();
 
     public String getUserData(String username, CredentialsDataType typeOfData) {

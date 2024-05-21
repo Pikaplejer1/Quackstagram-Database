@@ -5,7 +5,7 @@ import MainFiles.User;
 import java.sql.*;
 
 public class UpdateCredentials {
-    DatabaseInstance database = DatabaseInstance.getInstance("jdbc:mysql://localhost:3306/quackstagram_db","root","julia");
+    DatabaseInstance database = DatabaseInstance.getInstance("jdbc:mysql://localhost:3306/Quackstagram","root","marcel");
     Connection conn = database.getConn();
     public void createUser(String username, String password, String bio) throws SQLException {
         try{

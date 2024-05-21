@@ -154,25 +154,37 @@ public class ImageLikesManager extends ImageDetailsReader {
         return false;
     }
 
-    public int countLikes(String postId){
+    public int countLikes(String postPhotoDir) {
         int likes = 0;
 
         try {
-            PreparedStatement preparedStatement = conn.prepareStatement("SELECT COUNT(Post_id) AS result FROM likes WHERE Post_id = ? ");
+            PreparedStatement preparedStatement = conn.prepareStatement(
+                    "SELECT COUNT(likes.post_id) AS result " +
+                            "FROM likes " +
+                            "JOIN post ON likes.post_id = post.post_id " +
+                            "WHERE post.post_photo_dir = ?"
+            );
 
-            preparedStatement.setString(1, postId);
+            // Debugging statement to verify the postPhotoDir
+            System.out.println("Post Photo Dir: " + postPhotoDir);
 
-            try (ResultSet resultSet = preparedStatement.executeQuery()) {
-                while (resultSet.next()) {
-                    likes = resultSet.getInt("result");
-                }
+            preparedStatement.setString(1, postPhotoDir);
+            ResultSet rs = preparedStatement.executeQuery();
+            if (rs.next()) {
+                // Debugging statement to check the result from ResultSet
+                System.out.println("Query Result: " + rs.getInt(1));
+                likes = rs.getInt(1);
+            } else {
+                // Debugging statement to handle the case when no rows are returned
+                System.out.println("No rows returned");
             }
-
             return likes;
         } catch (SQLException e) {
+            e.printStackTrace();
             throw new RuntimeException(e);
         }
     }
+
 
 }
 
