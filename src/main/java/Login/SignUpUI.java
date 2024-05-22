@@ -139,9 +139,6 @@ public class SignUpUI extends LoginBaseUI implements  SignUpResultListener{
     @Override
     public void onSuccess(String username, String password, String bio) {
         dispose();
-        profileManager.handleProfilePictureUpload(this,username);
-        CreateUser createUser = new CreateUser();
-        createUser.saveCredentials(username,password,bio);
         openSignInUI(null);
     }
 

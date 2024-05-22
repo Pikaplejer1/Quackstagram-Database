@@ -1,7 +1,6 @@
 package Database;
 
 import MainFiles.User;
-import com.google.protobuf.StringValueOrBuilder;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;

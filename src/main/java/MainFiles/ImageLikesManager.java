@@ -45,7 +45,7 @@ public class ImageLikesManager extends ImageDetailsReader {
                     "INSERT INTO likes (Post_id, Username_who_liked, Timestamp)" +
                             "VALUES (?, ?, ?)");
 
-            preparedStatement.setString(1, getPostId(postId));
+            preparedStatement.setInt(1, getPostId(postId));
             preparedStatement.setString(2, currentUser.getUsername());
             preparedStatement.setTimestamp(3, Timestamp.from(timestamp));
 
@@ -64,26 +64,30 @@ public class ImageLikesManager extends ImageDetailsReader {
         //creator.newNotification(getPostsUser(postId), "like");
     }
 
-    public String getPostId(String postDir){
+    public int getPostId(String postDir){
+        // Escape backslashes in the file path
+        System.out.println(postDir);
         try {
             PreparedStatement preparedStatement = conn.prepareStatement(
-                    "SELECT Post_id FROM Post WHERE post_photo_dir = ? ");
+                    "SELECT Post_id FROM Post WHERE post_photo_dir = ?");
 
+            // Set the parameter for the prepared statement
             preparedStatement.setString(1, postDir);
-
+            System.out.println(preparedStatement);
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
 
-                while (resultSet.next()) {
-                    String username = resultSet.getString("Post_id");
-                    return username ;
+                if(resultSet.next()){
+                    return resultSet.getInt(1);
                 }
             }
 
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-        return "";
+        return 0;
     }
+
+
 
     private String getPostsUser(String postId){
 
@@ -116,7 +120,7 @@ public class ImageLikesManager extends ImageDetailsReader {
             PreparedStatement preparedStatement = conn.prepareStatement(
                     "DELETE FROM likes WHERE Post_id = ? AND Username_who_liked = ?");
 
-            preparedStatement.setString(1, getPostId(postId));
+            preparedStatement.setInt(1, getPostId(postId));
             preparedStatement.setString(2, currentUser.getUsername());
 
             int rowsAffected = preparedStatement.executeUpdate();
@@ -138,7 +142,7 @@ public class ImageLikesManager extends ImageDetailsReader {
             PreparedStatement preparedStatement = conn.prepareStatement(
                     "SELECT * FROM likes WHERE Post_id = ? AND Username_who_liked = ?");
 
-            preparedStatement.setString(1, getPostId(postId));
+            preparedStatement.setInt(1, getPostId(postId));
             preparedStatement.setString(2, currentUser.getUsername());
 
             try (ResultSet resultSet = preparedStatement.executeQuery()) {

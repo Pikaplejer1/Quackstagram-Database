@@ -5,10 +5,7 @@ import Utils.CredentialsDataType;
 import Utils.PostDataType;
 
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 
 public class GetCredentials {
 
@@ -35,7 +32,9 @@ public class GetCredentials {
 
 
     public String getPostData(String filePath, PostDataType dataType){
-        String imageId;
+        int imageId;
+//        System.out.println(filePath);
+//        System.out.println(dataType);
         try {
             ImageLikesManager manager = new ImageLikesManager();
             imageId = manager.getPostId(filePath);
@@ -50,15 +49,22 @@ public class GetCredentials {
                             "FROM User_profile u " +
                             "JOIN Post p ON u.username = p.username " +
                             "WHERE p.post_id = ?");
-            preparedStatement.setString(1,imageId);
+            preparedStatement.setInt(1, imageId);
             ResultSet rs = preparedStatement.executeQuery();
-            if(rs.next()){
-                return rs.getString(dataType.getColumnName());
+            if (rs.next()) {
+                String columnName = dataType.getColumnName();
+                if ("likes".equals(columnName)) {
+                    // Use getInt for numerical values
+                    return String.valueOf(rs.getInt("likes"));
+                } else {
+                    return rs.getString(columnName);
+                }
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
         return null;
     }
+
 
 }

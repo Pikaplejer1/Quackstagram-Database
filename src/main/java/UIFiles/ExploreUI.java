@@ -143,10 +143,15 @@ public class ExploreUI extends BaseUI {
 
     private void extractImageDetails(String imagePath ){
         GetCredentials getPostData = new GetCredentials();
+        System.out.println("-------------------");
         username = getPostData.getPostData(imagePath, PostDataType.USERNAME);
+        System.out.println(username);
         bio = getPostData.getPostData(imagePath, PostDataType.BIO);
+        System.out.println(bio);
         timestampString = getPostData.getPostData(imagePath,PostDataType.TIMESTAMP);
+        System.out.println(timestampString);
         likes = Integer.parseInt(getPostData.getPostData(imagePath, PostDataType.LIKES));
+        System.out.println(likes);
     }
 
 
