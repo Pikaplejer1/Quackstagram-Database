@@ -54,7 +54,10 @@ public class HandleCredentials {
      */
     private Boolean verifyCredentials(String username, String password) {
         GetCredentials getCredentials = new GetCredentials();
-        if(password.equals(getCredentials.getUserData(username, CredentialsDataType.PASSWORD))){
+        HashingUtil hashingUtil = new HashingUtil();
+        if(hashingUtil.toHash(password)
+                .equals(
+                getCredentials.getUserData(username, CredentialsDataType.PASSWORD))){
             String bio = getBio(username);
             user = User.getInstance(username,bio,password);
             return true;

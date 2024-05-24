@@ -7,6 +7,7 @@ import java.nio.file.Paths;
 import Database.GetCredentials;
 import MainFiles.FilePathInstance;
 import Utils.CredentialsDataType;
+import Utils.PostDataType;
 
 /**
  * Manages profile-related functionalities such as registration and checking if a username exists.
@@ -34,17 +35,8 @@ public class ProfileManager extends ProfilePictureManager {
      * @return true if the username exists, false otherwise.
      */
     public boolean doesUsernameExist(String username) {
-        try (BufferedReader reader = new BufferedReader(new FileReader(pathFile.credentialsNamePath()))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                if (line.startsWith(username + ":")) {
-                    return true;
-                }
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return false;
+        GetCredentials getUsername = new GetCredentials();
+        return username.equals(getUsername.getPostData(username, PostDataType.USERNAME));
     }
 
     /**
@@ -67,8 +59,9 @@ public class ProfileManager extends ProfilePictureManager {
      * @param bio      The bio information for the user.
      */
     public void onRegisterClicked(String username, String password, String bio) {
+        HashingUtil hashingUtil = new HashingUtil();
         if (isValidInput(username)) {
-            createUser.saveCredentials(username, HashingUtil.toHash(password), bio);
+            createUser.saveCredentials(username, hashingUtil.toHash(password), bio);
             listener.onSuccess(username, password, bio);
             createFolder(username);
         } else {

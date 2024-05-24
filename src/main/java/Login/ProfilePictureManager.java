@@ -17,16 +17,13 @@ import java.nio.file.Paths;
 public class ProfilePictureManager {
     private static final String IMAGE_FILE_EXTENSION = "png";
     private static final String IMAGE_FILE_TYPE = "Image file";
-    private static String PROFILE_IMAGE_STORAGE_PATH;
-    private final FilePathInstance pathFile = FilePathInstance.getInstance();
+    private static final String PROFILE_IMAGE_STORAGE_PATH = "pfp";
 
     /**
      * Constructor for ProfilePictureManager.
      * Initializes the storage path for profile images.
      */
-    ProfilePictureManager() {
-        PROFILE_IMAGE_STORAGE_PATH = pathFile.storageProfileNamePath();
-    }
+
 
     /**
      * Handles the process of uploading and updating a new profile picture.

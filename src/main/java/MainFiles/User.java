@@ -70,9 +70,6 @@ public class User {
      *
      * @return A string that represents the user's details with a hashed password.
      */
-    public String toStringHash() {
-        return username + ":" + bio + ":" + HashingUtil.toHash(password); // Hashes password
-    }
 
     public static User getInstance(String username, String bio, String password) {
         if(instance == null){
@@ -83,5 +80,6 @@ public class User {
     public static User getInstance(){
         return instance;
     }
+
 
 }

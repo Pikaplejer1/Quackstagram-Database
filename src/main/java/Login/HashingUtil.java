@@ -16,7 +16,7 @@ public class HashingUtil {
      * @return The SHA-256 hash of the input string.
      * @throws RuntimeException If the hashing algorithm is not supported or encoding issues occur.
      */
-    public static String toHash(String input) {
+    public String toHash(String input) {
         try {
             // Create MessageDigest instance for SHA-256
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
