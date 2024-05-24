@@ -181,7 +181,7 @@ public class InstagramProfileUI extends BaseUI {
 
         FollowManager followManager = new FollowManager();
 
-        JButton button = followManager.decideType(currentUser, this);
+        JButton button = followManager.decideType(currentUser, this, statsPanel);
         // Adds specific button based on certain conditions
         statsFollowPanel.add(button);
 

@@ -9,6 +9,6 @@ import javax.swing.*;
  */
 public interface FollowButtonBehaviour {
 
-    JButton createButton(User user, JFrame window);
+    JButton createButton(User user, JFrame window, JPanel statsPanel);
 
 }

@@ -17,7 +17,7 @@ public class EditProfileBehaviour implements FollowButtonBehaviour {
      * @param user The User object for whom the profile editing UI should be opened.
      * @return A JButton configured with text and an action listener.
      */
-    public JButton createButton(User user, JFrame window) {
+    public JButton createButton(User user, JFrame window, JPanel statsPanel) {
 
         JButton button = new JButton("Edit Profile");
         button.addActionListener(e -> {

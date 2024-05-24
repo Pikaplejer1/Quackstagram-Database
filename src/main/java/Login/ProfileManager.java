@@ -1,5 +1,8 @@
 package Login;
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import Database.GetCredentials;
 import MainFiles.FilePathInstance;
@@ -52,7 +55,7 @@ public class ProfileManager extends ProfilePictureManager {
      */
     public boolean isValidInput(String username) {
         GetCredentials getUsername = new GetCredentials();
-        return username.equals(getUsername.getUserData(username, CredentialsDataType.USERNAME));
+        return !username.equals(getUsername.getUserData(username, CredentialsDataType.USERNAME));
     }
 
     /**
@@ -67,8 +70,23 @@ public class ProfileManager extends ProfilePictureManager {
         if (isValidInput(username)) {
             createUser.saveCredentials(username, HashingUtil.toHash(password), bio);
             listener.onSuccess(username, password, bio);
+            createFolder(username);
         } else {
             listener.onFailure();
+        }
+    }
+
+    public static void createFolder(String username) {
+        Path path = Paths.get("posts/" + username);
+        if (!Files.exists(path)) {
+            try {
+                Files.createDirectories(path);
+                System.out.println("Folder created successfully at " + path.toAbsolutePath());
+            } catch (IOException e) {
+                System.err.println("Failed to create folder: " + e.getMessage());
+            }
+        } else {
+            System.out.println("Folder already exists at " + path.toAbsolutePath());
         }
     }
 }

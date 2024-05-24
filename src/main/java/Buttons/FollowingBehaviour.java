@@ -20,10 +20,12 @@ public class FollowingBehaviour implements FollowButtonBehaviour {
      * @param user The User object for which the following button is created.
      * @return A JButton configured with text 'Following' and an action listener.
      */
-    public JButton createButton(User user, JFrame window) {
+    public JButton createButton(User user, JFrame window, JPanel statsPanel) {
         JButton button = new JButton("Following");
         button.addActionListener(e -> {
             whenClicked(user, button, followManager);
+            statsPanel.revalidate();
+            statsPanel.repaint();
         });
         return button;
     }

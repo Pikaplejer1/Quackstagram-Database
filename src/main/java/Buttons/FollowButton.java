@@ -28,8 +28,8 @@ public class FollowButton extends JButton {
      * @param user The user for whom the button is created.
      * @return A styled JButton according to the specified behavior.
      */
-    public JButton createButton(User user, JFrame window) {
-        JButton button = followButtonBehaviour.createButton(user, window);
+    public JButton createButton(User user, JFrame window, JPanel statsPanel) {
+        JButton button = followButtonBehaviour.createButton(user, window, statsPanel);
         // Additional styling and properties set for the button
         button.setAlignmentX(Component.CENTER_ALIGNMENT);
         button.setFont(new Font("Arial", Font.BOLD, 12));

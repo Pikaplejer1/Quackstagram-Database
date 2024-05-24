@@ -18,7 +18,7 @@ public class FollowManager{
     NotificationsCreator creator = new NotificationsCreator();
     User currentUser = User.getInstance();
 
-    public JButton decideType(User userToTakActionOn, JFrame window){
+    public JButton decideType(User userToTakActionOn, JFrame window, JPanel statsPanel){
 
         JButton finalButton = new JButton();
 
@@ -34,19 +34,22 @@ public class FollowManager{
 
         if (thisUser) {
 
-            finalButton = editProfileButton.createButton(userToTakActionOn, window);
+            finalButton = editProfileButton.createButton(userToTakActionOn, window, statsPanel);
 
         } else if ((!thisUser )&& (isAlreadyFollowed(currentUser.getUsername(), userToTakActionOn.getUsername()))) {
 
-            finalButton = followingButton.createButton(userToTakActionOn, window);
+            finalButton = followingButton.createButton(userToTakActionOn, window, statsPanel);
 
         } else if ((!thisUser) && (!isAlreadyFollowed(currentUser.getUsername(), userToTakActionOn.getUsername()))){
 
-            finalButton = followButton.createButton(userToTakActionOn,window);
+            finalButton = followButton.createButton(userToTakActionOn, window, statsPanel);
 
         } else {
             System.out.println("It doesnt work");
         }
+
+        window.revalidate();
+        window.repaint();
 
          return finalButton;
     }

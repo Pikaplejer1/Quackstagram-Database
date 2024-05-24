@@ -21,11 +21,13 @@ public class FollowBehaviour implements FollowButtonBehaviour {
      * @return A configured JButton with the text "Follow" and an action listener.
      */
     @Override
-    public JButton createButton(User user, JFrame window) {
+    public JButton createButton(User user, JFrame window, JPanel statsPanel) {
         JButton button = new JButton("Follow");
 
         button.addActionListener(e -> {
             whenClicked(user, button, followManager);
+            statsPanel.revalidate();
+            statsPanel.repaint();
         });
 
         return button;

@@ -49,7 +49,7 @@ public class SignUpUI extends LoginBaseUI implements  SignUpResultListener{
 
 
         btnRegister = createButton("Register!", REGISTER_BUTTON_COLOR);
-        btnRegister.setForeground(BACKGROUND_COLOR);
+        btnRegister.setForeground(SIGNIN_BUTTON_COLOR);
         btnSignIn = createButton("Have an account? Sign in!", SIGNIN_BUTTON_COLOR);
         btnUploadPhoto = createButton("Upload Photo!", UPLOAD_BUTTON_COLOR);
 

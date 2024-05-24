@@ -24,6 +24,7 @@ public class CreateUser {
     public void saveCredentials(String username, String password, String bio) {
         UpdateCredentials updateCredentials = new UpdateCredentials();
         try {
+            System.out.println("registering...");
             updateCredentials.createUser(username,password,bio);
         } catch (SQLException e) {
             throw new RuntimeException(e);
