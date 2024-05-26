@@ -9,7 +9,8 @@ CREATE VIEW most_active_users AS
 SELECT username_send, COUNT(username_send) AS created_notifications
 FROM notification
 GROUP BY username_send
-HAVING COUNT(username_send) > 2;
+HAVING COUNT(username_send) > 2
+ORDER BY created_notifications DESC;
 
 CREATE VIEW posts_per_day AS
 SELECT
