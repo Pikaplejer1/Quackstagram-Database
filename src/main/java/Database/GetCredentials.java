@@ -33,7 +33,7 @@ public class GetCredentials {
         return result;
     }
 
-
+//*
     public String getPostData(String filePath, PostDataType dataType){
         String imageId;
         try {
